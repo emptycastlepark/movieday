@@ -5,7 +5,7 @@ from movies.models import Movie, Genre
 # Create your models here.
 class User(AbstractUser):
     nickname = models.CharField(max_length=10, default="익명")
-    profile_image = models.ImageField(blank=True)
+    profile_image = models.ImageField(upload_to='profile', default='default.jpg')
 
     like_genres = models.ManyToManyField(Genre, related_name='genre_like_users', blank=True)
 
