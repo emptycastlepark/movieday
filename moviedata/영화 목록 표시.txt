@@ -1,0 +1,58 @@
+
+    movies = Movie.objects.all()
+
+    genres = list(Genre.objects.all())
+
+    genre_dict = dict()
+    for genre in genres:
+        genre_dict[genre.name] = list(Genre.objects.get(name=genre).movie_set.all())
+
+    genre_cnt = dict()
+    for genre in genres:
+        genre_cnt[genre.name] = list(range(1, len(genre_dict[genre.name]) // 6))
+
+
+
+        
+    <!-- {% for genre, movies in genre_dict.items %}
+        <h2>{{ genre }}</h2> -->
+        
+        
+        <!-- <div class="row">
+            <div id="indicators-{{ genre }}" class="carousel slide" data-ride="carousel"> -->
+                <!-- <ol class="carousel-indicators">
+                    <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
+                    <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
+                    <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
+                </ol>
+                
+                <a class="carousel-control-prev col-1" href="#indicators-{{ genre }}" role="button" data-slide="prev">
+                    <i class="fas fa-backward fx-3"></i>
+                </a>
+
+                <div class="carousel-inner col-10 offset-1">
+                    <div class="carousel-item active">
+                        <div class="row">
+                            {% for movie in movies|slice:":6" %}
+                                <img src="https://image.tmdb.org/t/p/original/{{ movie.poster_path }}" class="d-block w-100 col-2" alt="...">
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% for movie_list in movies|helper_function %}
+                        <div class="carousel-item">
+                            <div class="row">
+                                {% for movie in movie_list %}
+                                    <img src="https://image.tmdb.org/t/p/original/{{ movie.poster_path }}" class="d-block w-100 col-2" alt="...">
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <a class="carousel-control-next col-1" href="#indicators-{{ genre }}" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                </a>
+            </div>
+        </div>
+    {% endfor %} -->오전 6:29 2020-06-12

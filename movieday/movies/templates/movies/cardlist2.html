@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load bootstrap_pagination %}
+
+{% block content %}
+
+    <h1>MovieTest</h1>
+    <div id="app" class="text-center">
+
+        <div class="row">
+            <div v-for="movie in movies" class="card col-3" style="width: 18rem;">
+                <img :src="getMoviePoster(movie)" class="card-img-top">
+                <div class="card-body">
+                    <h5 class="card-title">[[ movie.title ]]</h5>
+                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                    <button @click="getGenres(movie)" type="button" class="btn btn-primary float-right" data-toggle="modal" :data-target="makeModal(movie)">더보기</button>
+                </div>
+
+                <div class="modal fade" :id="getModal(movie)" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLongTitle">[[ movie.title ]] ([[movie.original_title ]])</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            </div>
+                            <img :src="getMoviePoster(movie)" class="card-img-top" alt="...">
+                            <div class="modal-body">
+                            <button class='btn btn-outline-success float-right'>[[ movie.vote_average ]]</button>
+                            <p>개봉일 : [[ movie.release_date ]]</p>
+                            <hr>
+                            [[ movie.like_users ]]
+
+                            <i v-if="checkLike(movie)" class="fas fa-heart" style="color:red;" data-dismiss="modal">좋아요 취소</i>
+                            <i v-else class="fas fa-heart" style="color:black;">좋아요</i>
+
+                            <h3>줄거리</h3>
+                            <p>[[ movie.overview ]]</p>
+                            
+                            <button v-for="genre in temp_genres" type="button" class="btn btn-outline-secondary animated infinite swing delay-1s slow">[[ genre ]]</button>
+                            <!-- {% for genre in movie.genres.all %}
+                                <button type="button" class="btn btn-outline-secondary animated infinite swing delay-1s slow">{{ genre.name }}</button>
+                            {% endfor %} -->
+                            </div>
+                            <div class="modal-footer">
+                    
+                            <button v-if="checkExclude(movie)" type="button" class="btn btn-danger exclude-buttons" data-dismiss="modal">실행 취소</button>
+                            <button v-else type="button" class="btn btn-danger exclude-buttons">안 볼거야!</button>
+                    
+                            <button v-if="checkLater(movie)" type="button" class="btn btn-info later-buttons" data-dismiss="modal">안 볼래용</button>
+                            <button v-else type="button" class="btn btn-info later-buttons">나중에 볼게요//</button>
+
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            
+                            <!-- 
+                            <p><span id="like-count-{{movie.pk}}">{{ movie.like_users.all|length }}</span>명이 좋아합니다!</p>
+ -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </div>
+        </div>
+
+
+        <div class="btn btn-group">
+            <button @click="moveFirst" class="btn btn-outline-primary">처음으로</button>
+            <button @click="movePage" v-if="curPageNumber - 1 > 0" class="btn btn-outline-primary">[[ curPageNumber - 1 ]]</button>
+            <button @click="movePage" v-if="curPageNumber > 0" class="btn btn-outline-primary">[[ curPageNumber ]]</button>
+            <button @click="movePage" class="btn btn-outline-primary">[[ curPageNumber + 1 ]]</button>
+            <button @click="movePage" v-if="curPageNumber < maxPageNumber" class="btn btn-outline-primary">[[ curPageNumber + 2 ]]</button>
+            <button @click="movePage" v-if="curPageNumber + 1 < maxPageNumber" class="btn btn-outline-primary">[[ curPageNumber + 3 ]]</button>
+            <button @click="moveLast" class="btn btn-outline-primary">마지막으로</button>
+        </div>
+    </div>
+{% endblock %}
+
+
+
+{% block vue %}
+
+    <script>
+        const app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: '#app',
+        data: {
+            curPageNumber: 0,
+            maxPageNumber: "{{ movie_cnt }}",
+            movies: {},
+            like_movies: [],
+            exclude_movies: [],
+            later_movies: [],
+            temp_genres: [],
+        },
+        methods: {
+            getMovies(pageNumber) {
+            axios.get(`/movies/jsonresponsetest/${pageNumber}`)
+                .then(res => {
+                    this.movies = res.data.movies
+                    this.like_movies = res.data.like_movies
+                    this.exclude_movies = res.data.exclude_movies
+                    this.later_movies = res.data.later_movies
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+            },
+            movePage(event) {
+                let page = parseInt(event.target.innerText) - 1
+                this.curPageNumber = page
+                this.getMovies(page)
+            },
+            moveFirst() {
+                this.curPageNumber = 0
+                this.getMovies(0)
+            },
+            moveLast() {
+                this.curPageNumber = parseInt(this.maxPageNumber)
+                this.getMovies(this.maxPageNumber)
+            },
+            getMoviePoster(movie) {
+                return `https://image.tmdb.org/t/p/original/${movie.poster_path}`
+            },
+            makeModal(movie) {
+                return `#modal-${movie.id}`
+            },
+            getModal(movie) {
+                return `modal-${movie.id}`
+            },
+            checkLike(movie) {
+                return this.like_movies.includes(movie.id)
+            },
+            checkExclude(movie) {
+                return this.exclude_movies.includes(movie.id)
+            },
+            checkLater(movie) {
+                return this.later_movies.includes(movie.id)
+            },
+            getGenres(movie) {
+                axios.get(`/movies/getgenres/${movie.id}`)
+                    .then(res => {
+                        this.temp_genres = res.data.genres.slice()
+                    })
+                    .catch(err => console.log(err))
+            }
+        },
+        created() {
+            this.getMovies(0)
+        }
+        })
+    </script>
+
+{% endblock %}
