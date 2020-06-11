@@ -159,6 +159,7 @@ def get_secret(setting, secret=secret):
 
 SECRET_KEY_MOVIE_API_KEY = get_secret("SECRET_KEY_MOVIE_API_KEY")
 
+SECRET_KEY_WEATHER_API_KEY = get_secret("SECRET_KEY_WEATHER_API_KEY")
 
 INTERNAL_IPS = [
     '127.0.0.1',

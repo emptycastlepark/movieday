@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block css %}
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'movies/upcomingmovies.css' %}">
+{% endblock %}
+
+
+{% block content %}
+<h1>Hello</h1>
+
+
+<!-- 이하 Vue 인스턴스 사용할 계획 -->
+    <div id="app">
+        <div class="main">
+            <table id="calendar" align="center">
+                <thead>
+                    <tr class="btn-wrap clearfix">
+                        <td>
+                            <button @click="movePrev" id="prev"><</button>
+                        </td>
+                        <td align="center" id="current-year-month" colspan="5">[[ year ]]년 [[ month+1 ]]월</td>
+                        <td>
+                            <button @click="moveNext" id="next">></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class = "sun" align="center">Sun</td>
+                        <td class="mon" align="center">Mon</td>
+                        <td class="tue" align="center">Tue</td>
+                        <td class="wed" align="center">Wed</td>
+                        <td class="thu" align="center">Thu</td>
+                        <td class="fri" align="center">Fri</td>
+                        <td class= "sat" align="center">Sat</td>
+                    </tr>
+                </thead>
+                <tbody id="calendar-body" class="calendar-body"></tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block vue %}
+
+<script>
+    const dayList = ['sun','mon','tue','wed','thu','fri','sat']
+    const monthList = ['January','February','March','April','May','June','July','August','September','October','November','December']
+    const leapYear=[31,29,31,30,31,30,31,31,30,31,30,31]
+    const notLeapYear=[31,28,31,30,31,30,31,31,30,31,30,31]
+
+    const today = new Date();
+
+    const app = new Vue({
+      delimiters: ['[[', ']]'],
+      el: '#app',
+      data: {
+        year: today.getFullYear(),
+        month: today.getMonth(),
+        day: 1,
+        isLeapYear: null,
+      },
+      methods: {
+        makeCalendar() {
+          console.log(this.year, this.month)
+          let currentTitle = document.getElementById('current-year-month');
+          let calendarBody = document.getElementById('calendar-body');
+          let pageFirst = new Date(this.year, this.month, 1);
+
+          let monthCnt = 100;
+          let cnt = 1;
+          for(var i = 0; i < 6; i++){
+              var $tr = document.createElement('tr');
+              $tr.setAttribute('id', monthCnt);   
+              for(var j = 0; j < 7; j++){
+                  if((i === 0 && j < new Date(this.year, this.month, 1).getDay()) || cnt > this.isLeapYear[this.month]){
+                      var $td = document.createElement('td');
+                      $tr.appendChild($td);     
+                  }else{
+                      var $td = document.createElement('td');
+                      $td.textContent = cnt;
+                      $td.setAttribute('id', cnt);  
+                      $td.setAttribute('class', dayList[j]);               
+                      $tr.appendChild($td);
+                      cnt++;
+                  }
+              }
+              monthCnt++;
+              calendarBody.appendChild($tr);
+          }
+        },
+        removeCalendar() {
+          let catchTr = 100;
+          for(var i = 100; i< 106; i++){
+              var $tr = document.getElementById(catchTr);
+              $tr.remove();
+              catchTr++;
+          }
+        },
+        movePrev() {
+          this.removeCalendar()
+          this.month -= 1
+          if (this.month == -1) {
+            this.month = 11
+            this.year -= 1
+          }
+          this.makeCalendar()
+        },
+        moveNext() {
+          this.removeCalendar()
+          this.month += 1
+          if (this.month == 12) {
+            this.month = 0
+            this.year += 1
+          }
+          this.makeCalendar()
+        }
+      },
+      created() {
+        if (this.year % 4 == 0) {
+          this.isLeapYear = leapYear
+        } else {
+          this.isLeapYear = notLeapYear
+        }
+      },
+      mounted() {
+        this.makeCalendar()
+      }
+    })
+</script>
+
+{% endblock %}

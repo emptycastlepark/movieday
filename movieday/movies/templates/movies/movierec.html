@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+    <!-- <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+      Launch demo modal
+    </button>
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display: none;">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal2">
+              Launch demo modal
+            </button>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal3">
+              Launch demo modal
+            </button>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="exampleModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display: none;">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            2번 Modal
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="exampleModal3" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display: none;">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            3번 Modal
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+   -->
+
+   <!-- 이하 Vue 인스턴스 사용할 계획 -->
+
+    {% if reason == "평점" %}
+        <p>장르 기반 추천을 받으려면 선호 장르 등록 / 영화 좋아요 버튼을 눌러주세요!</p>
+
+    {% else %}
+        <h2>추천 이유 : {{ reason }} 장르</h2>
+        <div class="row">
+            <div id="indicators-recommend-genre" class="carousel slide" data-ride="carousel">
+                
+                <a class="carousel-control-prev col-1" href="#indicators-recommend-genre" role="button" data-slide="prev">
+                    <i class="fas fa-backward fx-3"></i>
+                </a>
+
+                <div class="carousel-inner col-10 offset-1">
+                    <div class="carousel-item active">
+                        <div class="row">
+                            {% for movie in recommend_movies_genre|slice:":6" %}
+                                <img src="https://image.tmdb.org/t/p/original/{{ movie.poster_path }}" class="d-block w-100 col-2" alt="...">
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% for movie_list in recommend_movies_genre|helper_function %}
+                        <div class="carousel-item">
+                            <div class="row">
+                                {% for movie in movie_list %}
+                                    <img src="https://image.tmdb.org/t/p/original/{{ movie.poster_path }}" class="d-block w-100 col-2" alt="...">
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <a class="carousel-control-next col-1" href="#indicators-recommend-genre" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                </a>
+            </div>
+        </div>
+    {% endif %}
+
+    <h2>추천 이유 : 평점 높은 영화</h2>
+    <div class="row">
+        <div id="indicators-recommend-score" class="carousel slide" data-ride="carousel">
+            
+            <a class="carousel-control-prev col-1" href="#indicators-recommend-score" role="button" data-slide="prev">
+                <i class="fas fa-backward fx-3"></i>
+            </a>
+
+            <div class="carousel-inner col-10 offset-1">
+                <div class="carousel-item active">
+                    <div class="row">
+                        {% for movie in recommend_movies_score|slice:":6" %}
+                            <img src="https://image.tmdb.org/t/p/original/{{ movie.poster_path }}" class="d-block w-100 col-2" alt="...">
+                        {% endfor %}
+                    </div>
+                </div>
+                {% for movie_list in recommend_movies_score|helper_function %}
+                    <div class="carousel-item">
+                        <div class="row">
+                            {% for movie in movie_list %}
+                                <img src="https://image.tmdb.org/t/p/original/{{ movie.poster_path }}" class="d-block w-100 col-2" alt="...">
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <a class="carousel-control-next col-1" href="#indicators-recommend-score" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+            </a>
+        </div>
+    </div>
+
+    <div id="app">
+        <h2>날씨 기반 추천 예정 (반포본동 기준)</h2>
+        <h3>날씨 : [[ weather ]] / 온도 : [[ temperature ]]</h3>
+    </div>
+    
+{% endblock %}
+
+
+{% block vue %}
+  <script>
+    const app = new Vue({
+    delimiters: ['[[', ']]'],
+    el: '#app',
+    data: {
+      WEATHER_API_KEY: "{{ WEATHER_API_KEY }}",
+      latitude: 37.4866767,
+      longitude: 126.9436635,
+      weather: null,
+      temperature: 0,
+    },
+    methods: {
+      getWeather() {
+        axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${this.latitude}&lon=${this.longitude}&appid=${this.WEATHER_API_KEY}`)
+          .then(res => {
+            this.weather = res.data.weather[0].main
+            this.temperature = (res.data.main.temp - 273.15).toFixed(2)
+          })
+          .catch(err => {
+            console.log(err)
+          })
+        }
+      },
+      created() {
+        this.getWeather()
+      },
+    })
+  </script>
+{% endblock %}
