@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 def index(request):
@@ -15,12 +16,7 @@ def signup(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST, request.FILES)
         if form.is_valid():
-            user = form.save(commit=False)
-            if user.profile_image:
-                user.save()
-            else:
-                user.profile_image = '../static/default.jpg'
-                user.save()
+            user = form.save()
             # auth_login(request, user)
             return redirect('accounts:index')
     else:
@@ -47,25 +43,22 @@ def login(request):
     return render(request, 'accounts/login.html', context)
 
 
+@login_required
 def logout(request):
     auth_logout(request)
     return redirect('accounts:index')
 
 
+@login_required
 def update(request, user_id):
     User = get_user_model()
     user = get_object_or_404(User, id=user_id)
     if request.method == "POST":
         form = CustomUserChangeForm(request.POST, request.FILES, instance=user)
         if form.is_valid():
-            user = form.save(commit=False)
-            if user.profile_image:
-                user.save()
-            else:
-                user.profile_image = '../static/default.jpg'
-                user.save()
-            # auth_login(request, user)
-            return redirect('accounts:detail', user.id)
+            person = form.save()
+            # auth_login(request, person)
+            return redirect('accounts:detail', person.id)
     else:
         form = CustomUserChangeForm(instance=user)
     context = {
@@ -73,7 +66,7 @@ def update(request, user_id):
     }
     return render(request, 'accounts/signup.html', context)
 
-
+@login_required
 def detail(request, user_id):
     User = get_user_model()
     user = get_object_or_404(User, id=user_id)
