@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>{{ user.username }} : {{ user.nickname }}</h1>
+    <h2>선호 장르</h2>
+    <p>{{ user.like_genres.all }}</p>
+    <img src="{{ user.profile_image.url }}">
+{% endblock %}
