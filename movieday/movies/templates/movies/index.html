@@ -3,21 +3,120 @@
 {% load bootstrap_pagination %}
 
 {% block content %}
-    <div class="row">
-        {% for movie in page_obj %}
-            <div class="card col-3" style="width: 18rem;">
-                <img src="https://image.tmdb.org/t/p/original/{{ movie.poster_path }}" class="card-img-top">
-                <div class="card-body">
-                    <h5 class="card-title">{{ movie.title }}</h5>
-                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                    <button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#modal-{{ movie.pk }}">더보기</button>
-                </div>
-            </div>
 
-            {% include '_movie_modal.html' %}
-        {% endfor %}
+
+    <h1>Hello</h1>
+
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+      Launch demo modal
+    </button>
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display: none;">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal2">
+              Launch demo modal
+            </button>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal3">
+              Launch demo modal
+            </button>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary">Save changes</button>
+          </div>
+        </div>
+      </div>
     </div>
+    <div class="modal fade" id="exampleModal2" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display: none;">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            2번 Modal
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="exampleModal3" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display: none;">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            3번 Modal
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- 이하 Vue 인스턴스 사용할 계획 -->
+    {% for genre, movies in genre_dict.items %}
+        <h2>{{ genre }}</h2>
+        
+        
+        <div class="row">
+            <div id="indicators-{{ genre }}" class="carousel slide" data-ride="carousel">
+                <!-- <ol class="carousel-indicators">
+                    <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
+                    <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
+                    <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
+                </ol> -->
+                
+                <a class="carousel-control-prev col-1" href="#indicators-{{ genre }}" role="button" data-slide="prev">
+                    <i class="fas fa-backward fx-3"></i>
+                </a>
 
-    <div class="d-flex justify-content-center">{% bootstrap_paginate page_obj range=10 show_prev_next="false" show_first_last="true"%}</div>
+                <div class="carousel-inner col-10 offset-1">
+                    <div class="carousel-item active">
+                        <div class="row">
+                            {% for movie in movies|slice:":6" %}
+                                <img src="https://image.tmdb.org/t/p/original/{{ movie.poster_path }}" class="d-block w-100 col-2" alt="...">
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% for movie_list in movies|helper_function %}
+                        <div class="carousel-item">
+                            <div class="row">
+                                {% for movie in movie_list %}
+                                    <img src="https://image.tmdb.org/t/p/original/{{ movie.poster_path }}" class="d-block w-100 col-2" alt="...">
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <a class="carousel-control-next col-1" href="#indicators-{{ genre }}" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                </a>
+            </div>
+        </div>
+    {% endfor %}
+    
 {% endblock %}
 
