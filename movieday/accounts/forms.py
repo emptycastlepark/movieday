@@ -12,6 +12,7 @@ class CustomUserCreationForm(UserCreationForm):
         
 class CustomUserChangeForm(UserChangeForm):
     like_genres = ModelMultipleChoiceField(queryset=Genre.objects.all(), required=False, widget=CheckboxSelectMultiple, label='선호 장르')
+    password = None
 
     class Meta:
         model = get_user_model()

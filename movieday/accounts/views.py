@@ -7,34 +7,32 @@ from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
 
 # Create your views here.
-def index(request):
-    return render(request, 'accounts/index.html')
 
 def signup(request):
-    # if request.user.is_authenticated:
-    #     return redirect('accounts:index')
+    if request.user.is_authenticated:
+        return redirect('accounts:index')
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST, request.FILES)
         if form.is_valid():
             user = form.save()
-            # auth_login(request, user)
-            return redirect('accounts:index')
+            auth_login(request, user)
+            return redirect('movies:index')
     else:
         form = CustomUserCreationForm()
     context = {
         'form': form
     }
-    return render(request, 'accounts/signup.html', context)
+    return render(request, 'accounts/userform.html', context)
 
 
 def login(request):
-    # if request.user.is_authenticated:
-    #     return redirect('accounts:index')
+    if request.user.is_authenticated:
+        return redirect('movies:index')
     if request.method == 'POST':
         form = AuthenticationForm(request, request.POST)
         if form.is_valid():
             auth_login(request, form.get_user())
-            return redirect('accounts:index')
+            return redirect(request.GET.get('next') or 'movies:index')
     else:
         form = AuthenticationForm()
     context = {
@@ -43,28 +41,34 @@ def login(request):
     return render(request, 'accounts/login.html', context)
 
 
-@login_required
 def logout(request):
-    auth_logout(request)
-    return redirect('accounts:index')
+    if request.user.is_authenticated:
+        auth_logout(request)
+    return redirect('movies:index')
 
 
 @login_required
 def update(request, user_id):
     User = get_user_model()
     user = get_object_or_404(User, id=user_id)
-    if request.method == "POST":
-        form = CustomUserChangeForm(request.POST, request.FILES, instance=user)
-        if form.is_valid():
-            person = form.save()
-            # auth_login(request, person)
-            return redirect('accounts:detail', person.id)
+    if request.user == user:
+        if request.method == "POST":
+            form = CustomUserChangeForm(request.POST, request.FILES, instance=user)
+            if form.is_valid():
+                person = form.save()
+                # auth_login(request, person)
+                if not person.profile_image:
+                    person.profile_image = '../media/default.jpg'
+                    person.save()
+                return redirect('accounts:detail', person.id)
+        else:
+            form = CustomUserChangeForm(instance=user)
+        context = {
+            'form': form,
+        }
+        return render(request, 'accounts/userform.html', context)
     else:
-        form = CustomUserChangeForm(instance=user)
-    context = {
-        'form': form,
-    }
-    return render(request, 'accounts/signup.html', context)
+        return redirect('movies:index')
 
 @login_required
 def detail(request, user_id):
