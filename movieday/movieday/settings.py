@@ -37,14 +37,20 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
-    'bootstrap4',
+    # 쿼리 개선용
+    'debug_toolbar',
 
+    # Bootstrap
+    'bootstrap4',
+    'bootstrap_pagination',
+
+    # 앱
     'accounts',
     'movies',
 ]
 
 MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -53,6 +59,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
 
 ROOT_URLCONF = 'movieday.urls'
 
@@ -151,3 +158,8 @@ def get_secret(setting, secret=secret):
         raise ImproperlyConfigured(error_msg)
 
 SECRET_KEY_MOVIE_API_KEY = get_secret("SECRET_KEY_MOVIE_API_KEY")
+
+
+INTERNAL_IPS = [
+    '127.0.0.1',
+]

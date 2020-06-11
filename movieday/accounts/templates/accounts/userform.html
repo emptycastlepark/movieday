@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load bootstrap4 %}
+
+{% block css %}
+    <style>
+        .form-check {
+            display: inline-block
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    {% if request.resolver_match.url_name == 'signup' %}
+        <h2>신규 회원 가입</h2>
+    {% else %}
+        <h2>회원 정보 수정</h2>
+    {% endif %}
+
+    <form action="", method="POST", enctype="multipart/form-data">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+
+        {% if request.resolver_match.url_name == 'signup' %}
+            <button class="btn btn-primary">회원 가입</button>
+        {% else %}
+            <button class="btn btn-primary">정보 수정</button>
+        {% endif %}
+    </form>
+{% endblock %}

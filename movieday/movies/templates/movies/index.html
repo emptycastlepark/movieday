@@ -1,6 +1,23 @@
 {% extends 'base.html' %}
+{% load static %}
+{% load bootstrap_pagination %}
 
 {% block content %}
-    <h1>Index</h1>
+    <div class="row">
+        {% for movie in page_obj %}
+            <div class="card col-3" style="width: 18rem;">
+                <img src="https://image.tmdb.org/t/p/original/{{ movie.poster_path }}" class="card-img-top">
+                <div class="card-body">
+                    <h5 class="card-title">{{ movie.title }}</h5>
+                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                    <button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#modal-{{ movie.pk }}">더보기</button>
+                </div>
+            </div>
+
+            {% include '_movie_modal.html' %}
+        {% endfor %}
+    </div>
+
+    <div class="d-flex justify-content-center">{% bootstrap_paginate page_obj range=10 show_prev_next="false" show_first_last="true"%}</div>
 {% endblock %}
 
