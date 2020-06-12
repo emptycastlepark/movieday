@@ -12,21 +12,25 @@ import random
 import json
 
 def index(request):
-    return render(request, 'movies/index.html')
+    movie_count = Movie.objects.all().count()
+    review_count = MovieReview.objects.all().count()
+    context = {
+        'movie_count': movie_count,
+        'review_count': review_count,
+    }
+    return render(request, 'movies/index.html', context)
 
-def cardlist(request):
-    movie_cnt = Movie.objects.all().count() // 16
+def movie_list(request):
+    movie_cnt = Movie.objects.exclude(id__in=request.user.exclude_movies.all()).count() // 16
+    print(movie_cnt)
     context = {
         'movie_cnt': movie_cnt
     }
-    return render(request, 'movies/cardlist.html', context)
+    return render(request, 'movies/movies_list.html', context)
 
 
-def movierec(request):
+def movie_recommend(request):
     user = request.user
-
-    recommend_genre = '평점'
-    recommend_movies = Movie.objects.order_by('-vote_average', '-release_date')[:18]
 
     if user.like_movies.exists() or user.like_genres.exists():
         genres_cnt = dict()
@@ -74,57 +78,21 @@ def movierec(request):
         'recommend_movies_score': recommend_movies_score,
         'WEATHER_API_KEY': SECRET_KEY_WEATHER_API_KEY
     }
-    return render(request, 'movies/movierec.html', context)
+    return render(request, 'movies/movies_recommend.html', context)
 
 
-def upcomingmovies(request):
+def movie_upcoming(request):
     context = {
         'MOVIE_API_KEY': SECRET_KEY_MOVIE_API_KEY
     }
-    return render(request, 'movies/upcomingmovies.html', context)
+    return render(request, 'movies/movies_upcoming.html', context)
 
 
-@login_required
-def createreview(request, movie_id):
-    movie = get_object_or_404(Movie, id=movie_id)
-    if request.method == 'POST':
-        form = MovieReviewForm(request.POST)
-        if form.is_valid():
-            review = form.save(commit=False)
-            review.author = request.user
-            review.movie = movie
-            review.save()
-            return redirect('movies:reviewlist')
-    else:
-        form = MovieReviewForm()
-    context = {
-        'form': form,
-        'movie': movie,
-    }
-    return render(request, 'movies/createreview.html', context)
 
-
-@login_required
-def createreviewwithoutmovie(request):
-    if request.method == 'POST':
-        form = MovieReviewWithoutMovieForm(request.POST)
-        if form.is_valid():
-            review = form.save(commit=False)
-            review.author = request.user
-            review.save()
-            return redirect('movies:reviewlist')
-    else:
-        form = MovieReviewWithoutMovieForm()
-    context = {
-        'form': form,
-    }
-    return render(request, 'movies/createreview.html', context)
-
-
-def reviewlist(request):
+def review_list(request):
     reviews = MovieReview.objects.order_by('-id')
 
-    paginator = Paginator(reviews, 9)
+    paginator = Paginator(reviews, 10)
 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -133,10 +101,61 @@ def reviewlist(request):
         'reviews': reviews,
         'page_obj': page_obj,
     }
-    return render(request, 'movies/reviewlist.html', context)
+    return render(request, 'movies/review_list.html', context)
+
+def review_list_movie(request, movie_id):
+    movie = get_object_or_404(Movie, id=movie_id)
+    reviews = MovieReview.objects.filter(movie_id=movie.id)
+    paginator = Paginator(reviews, 10)
+
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'movie': movie,
+        'reviews': reviews,
+        'page_obj': page_obj,
+    }
+    return render(request, 'movies/review_list_movie.html', context)
+
+@login_required
+def review_create(request, movie_id):
+    movie = get_object_or_404(Movie, id=movie_id)
+    if request.method == 'POST':
+        form = MovieReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.author = request.user
+            review.movie = movie
+            review.save()
+            return redirect('movies:review_list')
+    else:
+        form = MovieReviewForm()
+    context = {
+        'form': form,
+        'movie': movie,
+    }
+    return render(request, 'movies/review_create.html', context)
 
 
-def jsonresponsetest(request, pageNum):
+@login_required
+def review_create_withoutmovie(request):
+    if request.method == 'POST':
+        form = MovieReviewWithoutMovieForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.author = request.user
+            review.save()
+            return redirect('movies:review_list')
+    else:
+        form = MovieReviewWithoutMovieForm()
+    context = {
+        'form': form,
+    }
+    return render(request, 'movies/review_create.html', context)
+
+
+def get_movies(request, pageNum):
     like_movies = list(request.user.like_movies.values_list('id', flat=True))
     exclude_movies = list(request.user.exclude_movies.values_list('id', flat=True))
     later_movies = list(request.user.later_movies.values_list('id', flat=True))
@@ -144,12 +163,12 @@ def jsonresponsetest(request, pageNum):
     return JsonResponse({'movies': movies, 'like_movies': like_movies, 'exclude_movies': exclude_movies, 'later_movies': later_movies}, status = 200)
 
 
-def getgenres(request, movie_id):
+def get_genres(request, movie_id):
     genres = list(get_object_or_404(Movie, id=movie_id).genres.all().values_list('name', flat=True))
     return JsonResponse({'genres': genres}, status = 200)
 
 
-def getrecommend(request, weather, temp):
+def get_movie_recommend(request, weather, temp):
     recommend_genre = []
     if (float(temp) >= 25):
         recommend_genre.append(["오늘 같이 더운 날, ", ["Horror", "Thriller"]])
@@ -160,11 +179,13 @@ def getrecommend(request, weather, temp):
 
     final_reason = final_recommend[0]
     final_genre = random.choice(final_recommend[1])
+    
+    recommended_movies = list(Genre.objects.get(name=final_genre).movie_set.exclude(id__in=request.user.exclude_movies.all()).values())[:18]
 
-    return JsonResponse({'final_reason': final_reason, 'final_genre': final_genre}, status = 200)
+    return JsonResponse({'final_reason': final_reason, 'final_genre': final_genre, 'recommended_movies': recommended_movies}, status = 200)
 
 
-def like(request, movie_id):
+def movie_like(request, movie_id):
     print(1)
     user = request.user
     movie = get_object_or_404(Movie, id=movie_id)
@@ -176,12 +197,9 @@ def like(request, movie_id):
         movie.like_users.add(user)
         liked = True
 
-    return JsonResponse({
-        'liked': liked,
-        'like_count': movie.like_users.count()
-    })
+    return JsonResponse({'liked': liked, 'like_count': movie.like_users.count()})
 
-def exclude(request, movie_id):
+def movie_exclude(request, movie_id):
     user = request.user
     movie = get_object_or_404(Movie, id=movie_id)
 
@@ -192,11 +210,9 @@ def exclude(request, movie_id):
         movie.exclude_users.add(user)
         exclude = True
 
-    return JsonResponse({
-        'exclude': exclude,
-    })
+    return JsonResponse({'exclude': exclude})
 
-def later(request, movie_id):
+def movie_later(request, movie_id):
     user = request.user
     movie = get_object_or_404(Movie, id=movie_id)
 
@@ -207,20 +223,18 @@ def later(request, movie_id):
         movie.later_users.add(user)
         later = True
 
-    return JsonResponse({
-        'later': later,
-    })
+    return JsonResponse({'later': later})
 
 @register.filter
 def helper_function(input_list):
 
-    temp_list2 = list(input_list)
-    temp_list = []
+    slicing_list = list(input_list)
+    sliced_list = []
 
-    for i in range(1, len(temp_list2) // 6):
-        temp_list.append(temp_list2[6*i:6*(i+1)])
+    for i in range(1, len(slicing_list) // 6):
+        sliced_list.append(slicing_list[6*i:6*(i+1)])
 
-    return temp_list
+    return sliced_list
 
 
 

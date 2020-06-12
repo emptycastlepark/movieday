@@ -1,0 +1,356 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block css %}
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'movies/movie_recommend.css' %}">
+{% endblock %}
+
+
+{% block content %}
+
+    {% if reason == 1 %}
+      <h2>추천 이유 : {{ recommend_genre }} 장르</h2>
+    {% elif reason == 2 %}
+      <h2>선호 작품에 맞는 영화가 없어서 임의로 선택된 {{ recommend_genre }} 장르를 추천합니다.</h2>
+    {% else %}
+      <h2>선호 작품이 없어서 임의로 선택된 {{ recommend_genre }} 장르를 추천합니다.</h2>
+    {% endif %}
+    <div class="row">
+      <div id="indicators-recommend-genre" class="carousel slide" data-ride="carousel">
+          
+          <a class="carousel-control-prev col-1" href="#indicators-recommend-genre" role="button" data-slide="prev">
+            <i class="fas fa-backward fx-3"></i>
+          </a>
+
+          <div class="carousel-inner col-10 offset-1">
+            <div class="carousel-item active">
+              <div class="row">
+                {% for movie in recommend_movies_genre|slice:":6" %}
+                  <img src="https://image.tmdb.org/t/p/original/{{ movie.poster_path }}" data-toggle="modal" data-target="#modal-{{ movie.pk }}" class="d-block w-100 col-2" alt="...">
+                {% endfor %}
+              </div>
+            </div>
+            {% for movie_list in recommend_movies_genre|helper_function %}
+              <div class="carousel-item">
+                <div class="row">
+                  {% for movie in movie_list %}
+                    <img src="https://image.tmdb.org/t/p/original/{{ movie.poster_path }}" data-toggle="modal" data-target="#modal-{{ movie.pk }}" class="d-block w-100 col-2" alt="...">
+                  {% endfor %}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+
+          <a class="carousel-control-next col-1" href="#indicators-recommend-genre" role="button" data-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+          </a>
+      </div>
+    </div>
+
+    {% for movie in recommend_movies_genre %}
+      <div class="modal fade" id="modal-{{ movie.pk }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">{{ movie.title }} ({{movie.original_title }})</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <img src="https://image.tmdb.org/t/p/original/{{ movie.poster_path }}" class="card-img-top" alt="...">
+              <div class="modal-body">
+                <button class='btn btn-outline-success float-right'>{{ movie.vote_average }}</button>
+                <p>개봉일 : {{ movie.release_date }}</p>
+                <hr>
+                <h3>줄거리</h3>
+                <p>{{ movie.overview }}</p>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+        </div>
+      </div>
+    {% endfor %}
+
+
+    <h2>추천 이유 : 평점 높은 영화</h2>
+    <div class="row">
+      <div id="indicators-recommend-score" class="carousel slide" data-ride="carousel">
+          
+        <a class="carousel-control-prev col-1" href="#indicators-recommend-score" role="button" data-slide="prev">
+          <i class="fas fa-backward fx-3"></i>
+        </a>
+
+        <div class="carousel-inner col-10 offset-1">
+          <div class="carousel-item active">
+            <div class="row">
+              {% for movie in recommend_movies_score|slice:":6" %}
+                <img src="https://image.tmdb.org/t/p/original/{{ movie.poster_path }}" data-toggle="modal" data-target="#modal-{{ movie.pk }}" class="d-block w-100 col-2" alt="...">
+              {% endfor %}
+            </div>
+          </div>
+          {% for movie_list in recommend_movies_score|helper_function %}
+            <div class="carousel-item">
+              <div class="row">
+                {% for movie in movie_list %}
+                  <img src="https://image.tmdb.org/t/p/original/{{ movie.poster_path }}" data-toggle="modal" data-target="#modal-{{ movie.pk }}" class="d-block w-100 col-2" alt="...">
+                {% endfor %}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <a class="carousel-control-next col-1" href="#indicators-recommend-score" role="button" data-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="sr-only">Next</span>
+        </a>
+      </div>
+    </div>
+    
+    {% for movie in recommend_movies_score %}
+      <div class="modal fade" id="modal-{{ movie.pk }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">{{ movie.title }} ({{movie.original_title }})</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <img src="https://image.tmdb.org/t/p/original/{{ movie.poster_path }}" class="card-img-top" alt="...">
+              <div class="modal-body">
+                <button class='btn btn-outline-success float-right'>{{ movie.vote_average }}</button>
+                <p>개봉일 : {{ movie.release_date }}</p>
+                <hr>
+                <h3>줄거리</h3>
+                <p>{{ movie.overview }}</p>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+        </div>
+      </div>
+    {% endfor %}
+
+
+   <!-- 이하 Vue 사용할 계획 -->
+    <div id="app">
+      <p id = "status"></p>
+      <h2>날씨 기반 추천 (날씨 : [[ weather ]] / 온도 : [[ temperature ]])</h2>
+      <p v-if="isFakeLoc">위치 정보가 없어서 개발자의 위치 기준으로 영화가 추천됩니다.</p>
+      <button v-if="isFakeLoc" class="btn btn-outline-primary" @click="getWeather">현재 날씨 기반 추천 받기</button>
+      <button class="btn btn-outline-secondary" @click="changeGenre">별로 마음에 안 들어요..</button>
+      <h4>[[ recommend_ment ]] [[ recommend_genre ]] 장르 어떠세요?</h4>
+      
+      <div class="row">
+        <div id="indicators-recommend-weather" class="carousel slide" data-ride="carousel">
+          <a class="carousel-control-prev col-1" href="#indicators-recommend-weather" role="button" data-slide="prev">
+            <i class="fas fa-backward fx-3"></i>
+          </a>
+
+          <div class="carousel-inner col-10 offset-1">
+            <div class="carousel-item active">
+              <div class="row">
+                <img v-for="movie in first_movies" :src="getPosterUrl(movie)" data-toggle="modal" :data-target="makeModalId(movie)" class="d-block w-100 col-2" alt="...">
+              </div>
+            </div>
+                  
+            <div class="carousel-item">
+              <div class="row">
+                <img v-for="movie in second_movies" :src="getPosterUrl(movie)" data-toggle="modal" :data-target="makeModalId(movie)" class="d-block w-100 col-2" alt="...">
+              </div>
+            </div>
+                  
+            <div class="carousel-item">
+              <div class="row">
+                <img v-for="movie in last_movies" :src="getPosterUrl(movie)" data-toggle="modal" :data-target="makeModalId(movie)" class="d-block w-100 col-2" alt="...">
+              </div>
+            </div>
+          </div>
+
+          <a class="carousel-control-next col-1" href="#indicators-recommend-weather" role="button" data-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+          </a>
+        </div>
+      </div>
+    
+      <div v-for="movie in first_movies" class="modal fade" :id="getModalId(movie)" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLongTitle">[[ movie.title ]] ([[movie.original_title ]])</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <img :src="getPosterUrl(movie)" class="card-img-top" alt="...">
+            <div class="modal-body">
+              <button class='btn btn-outline-success float-right'>[[ movie.vote_average ]]</button>
+              <p>개봉일 : [[ movie.release_date ]]</p>
+              <hr>
+              <h3>줄거리</h3>
+              <p>[[ movie.overview ]]</p>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div v-for="movie in second_movies" class="modal fade" :id="getModalId(movie)" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLongTitle">[[ movie.title ]] ([[movie.original_title ]])</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <img :src="getPosterUrl(movie)" class="card-img-top" alt="...">
+            <div class="modal-body">
+              <button class='btn btn-outline-success float-right'>[[ movie.vote_average ]]</button>
+              <p>개봉일 : [[ movie.release_date ]]</p>
+              <hr>
+              <h3>줄거리</h3>
+              <p>[[ movie.overview ]]</p>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div v-for="movie in last_movies" class="modal fade" :id="getModalId(movie)" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLongTitle">[[ movie.title ]] ([[movie.original_title ]])</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <img :src="getPosterUrl(movie)" class="card-img-top" alt="...">
+            <div class="modal-body">
+              <button class='btn btn-outline-success float-right'>[[ movie.vote_average ]]</button>
+              <p>개봉일 : [[ movie.release_date ]]</p>
+              <hr>
+              <h3>줄거리</h3>
+              <p>[[ movie.overview ]]</p>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+{% endblock %}
+
+
+{% block vue %}
+  <script>
+    const app = new Vue({
+    delimiters: ['[[', ']]'],
+    el: '#app',
+    data: {
+      WEATHER_API_KEY: "{{ WEATHER_API_KEY }}",
+      latitude: 0,
+      longitude: 0,
+      weather: null,
+      temperature: 0,
+      recommend_ment: null,
+      recommend_genre: null,
+      first_movies: [],
+      second_movies: [],
+      last_movies: [],
+      isFakeLoc: true,
+      },
+    methods: {
+      getWeatherMovie(latitude, longitude) {
+        axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${this.WEATHER_API_KEY}`)
+          .then(res => {
+            this.weather = res.data.weather[0].main
+            this.temperature = (res.data.main.temp - 273.15).toFixed(2)
+            axios.get(`/movies/get_movie_recommend/${res.data.weather[0].main}/${(res.data.main.temp - 273.15).toFixed(2)}`)
+              .then(res => {
+                this.recommend_ment = res.data.final_reason
+                this.recommend_genre = res.data.final_genre
+                this.first_movies = res.data.recommended_movies.slice(0, 6)
+                this.second_movies = res.data.recommended_movies.slice(6, 12)
+                this.last_movies = res.data.recommended_movies.slice(12, 18)
+              })
+              .catch(err => {
+                console.log(err)
+              })
+          })
+          .catch(err => {
+            console.log(err)
+          })
+        },
+      getWeather() {
+        this.isFakeLoc = false
+        let self = this
+        const status = document.querySelector('#status');
+
+        function success(position) {
+          let latitude  = position.coords.latitude;
+          let longitude = position.coords.longitude;
+          axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${self.WEATHER_API_KEY}`)
+            .then(res => {
+              self.weather = res.data.weather[0].main
+              self.temperature = (res.data.main.temp - 273.15).toFixed(2)
+                axios.get(`/movies/get_movie_recommend/${res.data.weather[0].main}/${(res.data.main.temp - 273.15).toFixed(2)}`)
+                  .then(response => {
+                    self.recommend_ment = response.data.final_reason
+                    self.recommend_genre = response.data.final_genre
+                    self.first_movies = response.data.recommended_movies.slice(0, 6)
+                    self.second_movies = response.data.recommended_movies.slice(6, 12)
+                    self.last_movies = response.data.recommended_movies.slice(12, 18)
+                  })
+                  .catch(err => {
+                    console.log(err)
+                  })
+            })
+            .catch(err => {
+              console.log(err)
+            })
+          status.textContent = ''
+        }
+
+        function error() {
+          status.textContent = 'Unable to retrieve your location';
+        }
+
+        if(!navigator.geolocation) {
+          status.textContent = 'Geolocation is not supported by your browser';
+        } else {
+          status.textContent = 'Locating…';
+          navigator.geolocation.getCurrentPosition(success, error);
+        }
+      },
+      changeGenre() {
+        axios.get(`/movies/get_movie_recommend/${this.weather}/${this.temperature}`)
+          .then(res => {
+            this.recommend_ment = res.data.final_reason
+            this.recommend_genre = res.data.final_genre
+            this.first_movies = res.data.recommended_movies.slice(0, 6)
+            this.second_movies = res.data.recommended_movies.slice(6, 12)
+            this.last_movies = res.data.recommended_movies.slice(12, 18)
+          })
+          .catch(err => {
+            console.log(err)
+          })
+      },
+      getPosterUrl(movie) {
+        return `https://image.tmdb.org/t/p/original/${movie.poster_path}`
+      },
+      makeModalId(movie) {
+        return `#modal-${movie.id}`
+      },
+      getModalId(movie) {
+        return `modal-${movie.id}`
+      }
+    },
+    created() {
+      this.getWeatherMovie(37.48, 126.94)
+    },
+  })
+  </script>
+{% endblock %}

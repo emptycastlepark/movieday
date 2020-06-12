@@ -3,25 +3,24 @@
 
 {% block css %}
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="{% static 'movies/upcomingmovies.css' %}">
+    <link rel="stylesheet" href="{% static 'movies/movie_upcoming.css' %}">
 {% endblock %}
 
 
 {% block content %}
 
-
 <!-- 이하 Vue 인스턴스 사용할 계획 -->
     <div id="app">
         <h1>상영 예정 영화 (총 [[ countMovies ]]개)</h1>
         <div v-if="isList">
-            <button @click="changeComponent" class="btn btn-primary">캘린더로 보기</button>
+            <button @click="changeComponent" class="btn btn-primary">월 별로 보기</button>
             <div class="row">
                 <div v-for="upcomingMovie in upcomingMovies" class="card col-3" style="width: 18rem;">
                     <img :src="getPosterUrl(upcomingMovie)" class="card-img-top">
                     <div class="card-body">
                         <h5 class="card-title">[[ upcomingMovie.title ]]</h5>
                         <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                        <button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#modal-{{ movie.pk }}">더보기</button>
+                        <button type="button" class="btn btn-primary float-right" data-toggle="modal" :data-target="makeModalId(upcomingMovie)">더보기</button>
                     </div>
                 </div>
             </div>
@@ -29,6 +28,7 @@
 
         <div v-else>
             <button @click="changeComponent" class="btn btn-primary">리스트로 보기</button>
+
             <div class="row">
                 <button v-if="!isFirstMonth" @click="movePrev" id="prev" class="btn btn-outline-primary col-2"><</button>
                 <div v-else class="col-2"></div>
@@ -41,38 +41,37 @@
                     <div class="card-body">
                         <h5 class="card-title">[[ upcomingMovie.title ]]</h5>
                         <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                        <button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#modal-{{ movie.pk }}">더보기</button>
+                        <button type="button" class="btn btn-primary float-right" data-toggle="modal" :data-target="makeModalId(upcomingMovie)">더보기</button>
                     </div>
                 </div>
+
                 <div v-if="upcomingMonth.length == 0" ><h2>개봉 예정 영화가 없습니다.</h2></div>
             </div>
 
-            <div class="main">
-                <table id="calendar" align="center">
-                    <thead>
-                        <tr class="btn-wrap clearfix">
-                            <td>
-                                <button v-if="!isFirstMonth" @click="movePrev" id="prev"><</button>
-                            </td>
-                            <td align="center" id="current-year-month" colspan="5">[[ year ]]년 [[ month+1 ]]월</td>
-                            <td>
-                                <button v-if="!isLastMonth" @click="moveNext" id="next">></button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class = "sun" align="center">Sun</td>
-                            <td class="mon" align="center">Mon</td>
-                            <td class="tue" align="center">Tue</td>
-                            <td class="wed" align="center">Wed</td>
-                            <td class="thu" align="center">Thu</td>
-                            <td class="fri" align="center">Fri</td>
-                            <td class= "sat" align="center">Sat</td>
-                        </tr>
-                    </thead>
-                    <tbody id="calendar-body" class="calendar-body"></tbody>
-                </table>
+        </div>
+
+        <div v-for="upcomingMovie in upcomingMovies" class="modal fade" :id="getModalId(upcomingMovie)" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">[[ upcomingMovie.title ]] ([[upcomingMovie.original_title ]])</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <img :src="getPosterUrl(upcomingMovie)" class="card-img-top" alt="...">
+                <div class="modal-body">
+                    <p>개봉일 : [[ upcomingMovie.release_date ]]</p>
+                    <hr>
+                    <h3>줄거리</h3>
+                    <p>[[ upcomingMovie.overview ]]</p>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+                </div>
             </div>
         </div>
+
+
     </div>
 {% endblock %}
 
@@ -80,10 +79,6 @@
 {% block vue %}
 
 <script>
-    const dayList = ['sun','mon','tue','wed','thu','fri','sat']
-    const monthList = ['January','February','March','April','May','June','July','August','September','October','November','December']
-    const leapYear=[31,29,31,30,31,30,31,31,30,31,30,31]
-    const notLeapYear=[31,28,31,30,31,30,31,31,30,31,30,31]
     const today = new Date();
 
     const app = new Vue({
@@ -93,7 +88,6 @@
         year: today.getFullYear(),
         month: today.getMonth(),
         day: 1,
-        isLeapYear: null,
         upcomingMovies: [],
         MOVIE_API_KEY: "{{ MOVIE_API_KEY }}",
         isList: true,
@@ -111,62 +105,46 @@
                     this.lastMonth = temp_date[1]
                 }
             }
-            this.changeMonth()
-        },
-        makeCalendar() {
-          let currentTitle = document.getElementById('current-year-month');
-          let calendarBody = document.getElementById('calendar-body');
-          let pageFirst = new Date(this.year, this.month, 1);
-
-          let monthCnt = 100;
-          let cnt = 1;
-          for(var i = 0; i < 6; i++){
-              var $tr = document.createElement('tr');
-              $tr.setAttribute('id', monthCnt);   
-              for(var j = 0; j < 7; j++){
-                  if((i === 0 && j < new Date(this.year, this.month, 1).getDay()) || cnt > this.isLeapYear[this.month]){
-                      var $td = document.createElement('td');
-                      $tr.appendChild($td);     
-                  }else{
-                      var $td = document.createElement('td');
-                      $td.textContent = cnt;
-                      $td.setAttribute('id', cnt);  
-                      $td.setAttribute('class', dayList[j]);               
-                      $tr.appendChild($td);
-                      cnt++;
-                  }
-              }
-              monthCnt++;
-              calendarBody.appendChild($tr);
-          }
-        },
-        removeCalendar() {
-          let catchTr = 100;
-          for(var i = 100; i< 106; i++){
-              var $tr = document.getElementById(catchTr);
-              $tr.remove();
-              catchTr++;
-          }
+            console.log(this.changeMonth(this.year, this.month))
+            this.year = this.changeMonth(this.year, this.month)[0]
+            this.month = this.changeMonth(this.year, this.month)[1]
+            this.upcomingMonth = this.changeMonth(this.year, this.month)[2]
         },
         movePrev() {
-          this.removeCalendar()
-          this.month -= 1
-          if (this.month == -1) {
-            this.month = 11
-            this.year -= 1
+          let year = this.year
+          let month = this.month
+          while(true) {
+              month -= 1
+              if (month == -1) {
+                month = 11
+                year -= 1
+              }
+              res = this.changeMonth(year, month)
+              if (res[2].length > 0) {
+                  this.year = res[0]
+                  this.month = res[1]
+                  this.upcomingMonth = res[2]
+                  break
+              } 
           }
-          this.makeCalendar()
-          this.changeMonth()
         },
         moveNext() {
-          this.removeCalendar()
-          this.month += 1
-          if (this.month == 12) {
-            this.month = 0
-            this.year += 1
+          let year = this.year
+          let month = this.month
+          while(true) {
+              month += 1
+              if (month == 12) {
+                month = 0
+                year += 1
+              }
+              res = this.changeMonth(year, month)
+              if (res[2].length > 0) {
+                  this.year = res[0]
+                  this.month = res[1]
+                  this.upcomingMonth = res[2]
+                  break
+              } 
           }
-          this.makeCalendar()
-          this.changeMonth()
         },
         getUpcomingMovies(month, date) {
             let formatedmonth = 0
@@ -206,14 +184,21 @@
                 return `https://image.tmdb.org/t/p/original/${movie.poster_path}`
             }
         },
-        changeMonth() {
-            this.upcomingMonth = []
+        changeMonth(year, month) {
+            upcomingMonth = []
             for (let number=0; number<this.upcomingMovies.length; number++) {
                 movie_date = this.upcomingMovies[number].release_date.split("-")
-                if ((this.month+1 == movie_date[1]) && (this.year == movie_date[0])) {
-                    this.upcomingMonth.push(this.upcomingMovies[number])
+                if ((month+1 == movie_date[1]) && (year == movie_date[0])) {
+                    upcomingMonth.push(this.upcomingMovies[number])
                 }
             }
+            return [year, month, upcomingMonth]
+        },
+        makeModalId(movie) {
+            return `#modal-${movie.id}`
+        },
+        getModalId(movie) {
+            return `modal-${movie.id}`
         }
       },
       computed: {
@@ -228,12 +213,6 @@
         }
       },
       created() {
-        if (this.year % 4 == 0) {
-          this.isLeapYear = leapYear
-        } else {
-          this.isLeapYear = notLeapYear
-        }
-        this.makeCalendar()
       },
       mounted() {
         this.getUpcomingMovies(today.getMonth(), today.getDate())
