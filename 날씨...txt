@@ -1,3 +1,4 @@
+날씨 : 15개
 Thunderstorm / 뇌우
 Drizzle / 이슬비
 Rain / 비
@@ -13,3 +14,30 @@ Clouds / 구름낀
 Smoke
 Sand
 Ash
+
+
+장르 : 
+19 개 중 TV Movie와 History 제외 (DB에 없음) / 17개
+Adventure
+Fantasy
+Animation
+Drama
+Horror
+Action
+Comedy
+Western
+Thriller
+Crime
+Documentary
+Science Fiction
+Mystery
+Music
+Romance
+Family
+War
+History
+TV Movie
+
+
+날씨 1개당 2개의 장르 추천 / 일부 날씨는 3개 추천
+온도 범위를 0도부터 30도까지 5도 단위로 끊어서 8개 구간에 각각 2개씩 추천

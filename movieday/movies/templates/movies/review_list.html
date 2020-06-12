@@ -1,10 +1,17 @@
 {% extends 'base.html' %}
 {% load bootstrap_pagination %}
+{% load static %}
+
+{% block css %}
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'movies/review_list.css' %}">
+{% endblock %}
+
 
 {% block content %}
     <div id="app">
         <h1>리뷰 리스트</h1>
-        <a href="{% url 'movies:createreviewwithoutmovie' %}">리뷰쓰러 가기</a>
+        <a href="{% url 'movies:review_create_withoutmovie' %}">리뷰쓰러 가기</a>
 
         <ul>
             {% for review in page_obj %}
@@ -24,7 +31,9 @@
                             {{ review.movie.overview }}
                         </div>
                         <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <a href="{% url 'movies:review_list_movie' review.movie.id %}"><button class="btn btn-info">이 영화 리뷰 보러 가기</button></a>
+                            <a href="{% url 'movies:review_create' review.movie.id %}"><button class="btn btn-info">이 영화 리뷰 쓰러 가기</button></a>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         </div>
                     </div>
                     </div>

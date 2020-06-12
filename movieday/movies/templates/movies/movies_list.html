@@ -2,6 +2,13 @@
 {% load static %}
 {% load bootstrap_pagination %}
 
+
+{% block css %}
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'movies/movie_list.css' %}">
+{% endblock %}
+
+
 {% block content %}
 
     <h1>MovieTest</h1>
@@ -13,7 +20,8 @@
                 <div class="card-body">
                     <h5 class="card-title">[[ movie.title ]]</h5>
                     <p class="card-text">Sample</p>
-                    <a :href="getReviewUrl(movie)"><button class="btn btn-outline-info">리뷰 쓰러 가기</button></a>
+                    <a :href="getReviewUrl(movie)"><button class="btn btn-info">리뷰 보기</button></a>
+                    <a :href="getCreateReviewUrl(movie)"><button class="btn btn-outline-info">리뷰 쓰러 가기</button></a>
                     <button @click="getGenres(movie)" type="button" class="btn btn-primary float-right" data-toggle="modal" :data-target="makeModal(movie)">더보기</button>
                 </div>
 
@@ -99,7 +107,7 @@
         },
         methods: {
             getMovies(pageNumber) {
-            axios.get(`/movies/jsonresponsetest/${pageNumber}`)
+            axios.get(`/movies/get_movies/${pageNumber}`)
                 .then(res => {
                     this.movies = res.data.movies
                     this.like_movies = res.data.like_movies
@@ -114,14 +122,17 @@
                 let page = parseInt(event.target.innerText) - 1
                 this.curPageNumber = page
                 this.getMovies(page)
+                this.scrollToTop()
             },
             moveFirst() {
                 this.curPageNumber = 0
                 this.getMovies(0)
+                this.scrollToTop()
             },
             moveLast() {
                 this.curPageNumber = parseInt(this.maxPageNumber)
                 this.getMovies(this.maxPageNumber)
+                this.scrollToTop()
             },
             getMoviePoster(movie) {
                 return `https://image.tmdb.org/t/p/original/${movie.poster_path}`
@@ -145,17 +156,20 @@
                 return this.later_movies.includes(movie.id)
             },
             getGenres(movie) {
-                axios.get(`/movies/getgenres/${movie.id}`)
+                axios.get(`/movies/get_genres/${movie.id}`)
                     .then(res => {
                         this.temp_genres = res.data.genres.slice()
                     })
                     .catch(err => console.log(err))
             },
             getReviewUrl(movie) {
-                return `/movies/createreview/${movie.id}`
+                return `/movies/review_list_movie/${movie.id}`
+            },
+            getCreateReviewUrl(movie) {
+                return `/movies/review_create/${movie.id}`
             },
             changeLike(movie, event) {
-                axios.get(`/movies/like/${movie.id}`)
+                axios.get(`/movies/movie_like/${movie.id}`)
                     .then(res => {
                         console.log(res.data)
                         let like_count = res.data.like_count
@@ -172,7 +186,7 @@
                   .catch(err => console.log(err))
             },
             changeExclude(movie, event) {
-                axios.get(`/movies/exclude/${movie.id}/`)
+                axios.get(`/movies/movie_exclude/${movie.id}/`)
                     .then( res => {
                         let exclude = res.data.exclude
                         if (exclude) {
@@ -186,7 +200,7 @@
                     .catch(error=> {console.log(error)})
             },
             changeLater(movie, event) {
-                axios.get(`/movies/later/${movie.id}/`)
+                axios.get(`/movies/movie_later/${movie.id}/`)
                     .then( res => {
                         let later = res.data.later
                     if (later) {
@@ -196,7 +210,10 @@
                     }
                     })
                     .catch(error=> {console.log(error)})
-            }
+            },
+            scrollToTop () {
+            scroll(0, 0)
+            },
         },
         created() {
             this.getMovies(0)

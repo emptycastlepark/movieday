@@ -3,17 +3,24 @@ from django.views.decorators.http import require_POST
 from .models import Article, Comment
 from .forms import ArticleForm, CommentForm
 from django.http import JsonResponse
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 # Create your views here.
-def index(request):
+def article_index(request):
     articles = Article.objects.all()
+
+    paginator = Paginator(articles, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     context = {
         'articles': articles,
+        'page_obj': page_obj
     }
-    return render(request, 'community/index.html', context)
+    return render(request, 'community/article_index.html', context)
 
 
-def create(request):
+def article_create(request):
     if request.user.is_authenticated:
         if request.method == 'POST':
             form = ArticleForm(request.POST)
@@ -21,37 +28,37 @@ def create(request):
                 article = form.save(commit=False)
                 article.author = request.user
                 article.save()
-            return redirect('community:index')
+            return redirect('community:article_index')
         else:
             form = ArticleForm()
         context = {
             'form': form
         }
-        return render(request, 'community/create.html', context)
+        return render(request, 'community/article_create.html', context)
     else:
         return redirect('accounts:login')
 
 
-def detail(request, article_pk):
+def article_detail(request, article_pk):
     article = get_object_or_404(Article, pk=article_pk)
     form = CommentForm()
     context = {
         'article': article, 'form': form,
     }
-    return render(request, 'community/detail.html', context)
+    return render(request, 'community/article_detail.html', context)
 
 
 @require_POST
-def delete(request, article_pk):
+def article_delete(request, article_pk):
     article = get_object_or_404(Article, pk=article_pk)
     if request.user == article.author:
         article.delete()
-        return redirect('community:index')
+        return redirect('community:article_index')
     else:
-        return redirect('community:detail', article.pk)
+        return redirect('community:article_detail', article.pk)
 
 
-def update(request, article_pk):
+def article_update(request, article_pk):
     if request.user.is_authenticated:
         article = get_object_or_404(Article, pk=article_pk)
         if request.user == article.author:
@@ -59,21 +66,21 @@ def update(request, article_pk):
                 form = ArticleForm(request.POST, instance=article)
                 if form.is_valid():
                     article = form.save()
-                    return redirect('community:detail', article.pk)
+                    return redirect('community:article_detail', article.pk)
             else:
                 form = ArticleForm(instance=article)
             context = {
                 'form': form,
                 'article': article,
             }
-            return render(request, 'community/create.html', context)
+            return render(request, 'community/article_create.html', context)
         else:
-            return redirect('community:detail', article.pk)
+            return redirect('community:article_detail', article.pk)
     else:
         return redirect('accounts:login')
 
 
-def like(request, article_pk):
+def article_like(request, article_pk):
     user = request.user
     article = get_object_or_404(Article, pk=article_pk)
     if article.like_users.filter(pk=user.pk).exists():
@@ -97,7 +104,7 @@ def comment_create(request, article_pk):
             comment.article = article
             comment.author = request.user
             comment.save()
-        return redirect('community:detail', article.pk)
+        return redirect('community:article_detail', article.pk)
     else:
         return redirect('accounts:login')
 
@@ -107,6 +114,6 @@ def comment_delete(request, article_pk, comment_pk):
         comment = Comment.objects.get(pk=comment_pk)
         if comment.author == request.user:
             comment.delete()
-        return redirect('community:detail', article_pk)
+        return redirect('community:article_detail', article_pk)
     else:
         return redirect('accounts:login')

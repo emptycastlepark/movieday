@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load bootstrap_pagination %}
+{% load static %}
+
+{% block css %}
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'movies/review_list_movie.css' %}">
+{% endblock %}
+
+
+{% block content %}
+    <div id="app">
+        <h1>{{ movie.title }}의 리뷰 리스트</h1>
+        <a href="{% url 'movies:review_create' movie.id %}">이 영화 리뷰쓰러 가기</a>
+
+        <ul>
+            {% for review in page_obj %}
+                <li> {{ review.content }}</li>
+            {% empty %}
+                <h2>작성된 리뷰가 없습니다.</h2>
+            {% endfor %}
+        </ul>
+
+        <div class="d-flex justify-content-center">{% bootstrap_paginate page_obj range=10 show_prev_next="false" show_first_last="true"%}</div>
+    </div>
+{% endblock %}
+
+
+
+
+{% block vue %}
+{% endblock %}

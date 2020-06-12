@@ -2,6 +2,11 @@
 {% load bootstrap4 %}
 {% load static %}
 
+{% block css %}
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'community/article_detail.css' %}">
+{% endblock %}
+
 {% block content %}
   <h1>제목: {{ article.title }}</h1>
   <h3>내용: {{ article.content }}</h3>
@@ -16,11 +21,11 @@
       <i data-id="{{ article.pk }}" class="fas fa-heart fa-lg like-button" style="color:black; cursor: pointer;"></i>
     {% endif %}
   {% else %}
-    <form action="{% url 'community:delete' article.pk %}" method='POST'>
+    <form action="{% url 'community:article_delete' article.pk %}" method='POST'>
       {% csrf_token %}
       <button>삭제하기</button>
     </form>
-    <a href="{% url 'community:update' article.pk %}">수정하기</a>
+    <a href="{% url 'community:article_update' article.pk %}">수정하기</a>
   {% endif %}
   <form action="{% url 'community:comment_create' article.pk %}" method='POST'>
     {% csrf_token %}
@@ -44,7 +49,7 @@
     likeButtons.forEach(function(likeButton) {
       likeButton.addEventListener('click', function(event) {
         const articleId = event.target.dataset.id
-        axios.get(`/community/${articleId}/like/`)
+        axios.get(`/community/${articleId}/article_like/`)
           .then(response => {
             if (response.data.liked) {
               event.target.style.color = 'crimson'

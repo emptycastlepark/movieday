@@ -1,8 +1,15 @@
 {% extends 'base.html' %}
 {% load bootstrap4 %}
+{% load static %}
+
+{% block css %}
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'movies/review_create.css' %}">
+{% endblock %}
+
 
 {% block content %}
-    {% if request.resolver_match.url_name == 'createreview' %}
+    {% if request.resolver_match.url_name == 'review_create' %}
         <h1>{{ movie }} 리뷰 작성 중</h1>
     {% else %}
         <h1>리뷰 작성</h1>

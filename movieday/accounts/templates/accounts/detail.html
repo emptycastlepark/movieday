@@ -3,6 +3,9 @@
 
 {% block content %}
     <h1>{{ user.username }} : {{ user.nickname }}</h1>
+    {% if request.user == user %}
+        <a class="nav-link" href="{% url 'accounts:update' user.id %}">개인정보 수정하기</a>
+    {% endif %}
     <h2>선호 장르</h2>
     <p>{{ user.like_genres.all }}</p>
     <img src="{{ user.profile_image.url }}">

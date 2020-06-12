@@ -3,21 +3,22 @@ from . import views
 
 app_name="movies"
 urlpatterns = [
-    path('', views.cardlist, name='cardlist'),
-    path('movierec/', views.movierec, name='movierec'),
-    path('upcomingmovies/', views.upcomingmovies, name='upcomingmovies'),
+    path('', views.movie_list, name='movie_list'),
+    path('movie_recommend/', views.movie_recommend, name='movie_recommend'),
+    path('movie_upcoming/', views.movie_upcoming, name='movie_upcoming'),
 
-    path('createreview/', views.createreviewwithoutmovie, name='createreviewwithoutmovie'),
-    path('createreview/<int:movie_id>/', views.createreview, name='createreview'),
-    path('reviewlist/', views.reviewlist, name='reviewlist'),
+    path('review_list/', views.review_list, name='review_list'),
+    path('review_list_movie/<int:movie_id>/', views.review_list_movie, name="review_list_movie"),
+    path('review_create_withoutmovie/', views.review_create_withoutmovie, name='review_create_withoutmovie'),
+    path('review_create/<int:movie_id>/', views.review_create, name='review_create'),
 
-    path('like/<int:movie_id>/', views.like, name='like'),
-    path('exclude/<int:movie_id>/', views.exclude, name='exclude'),
-    path('later/<int:movie_id>/', views.later, name='later'),
+    path('movie_like/<int:movie_id>/', views.movie_like, name='movie_like'),
+    path('movie_exclude/<int:movie_id>/', views.movie_exclude, name='movie_exclude'),
+    path('movie_later/<int:movie_id>/', views.movie_later, name='movie_later'),
 
-    path('jsonresponsetest/<int:pageNum>/', views.jsonresponsetest, name='jsonresponsetest'),
-    path('getgenres/<int:movie_id>/', views.getgenres, name='getgenres'),
-    path('getrecommend/<str:weather>/<str:temp>/', views.getrecommend, name='getrecommend'),
+    path('get_movies/<int:pageNum>/', views.get_movies, name='get_movies'),
+    path('get_genres/<int:movie_id>/', views.get_genres, name='get_genres'),
+    path('get_movie_recommend/<str:weather>/<str:temp>/', views.get_movie_recommend, name='get_movie_recommend'),
 
     path('testing/', views.testing, name='testing'),
 ]
