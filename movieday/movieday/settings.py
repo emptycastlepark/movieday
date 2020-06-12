@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     # 앱
     'accounts',
     'movies',
+    'community',
 ]
 
 MIDDLEWARE = [
