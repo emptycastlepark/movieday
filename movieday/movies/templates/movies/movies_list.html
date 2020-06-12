@@ -13,13 +13,19 @@
 
     <h1>MovieTest</h1>
     <div id="app" class="text-center">
+        
+        <button type="button" class="btn btn-outline-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">[[ standard ]]</button>
+        <div class="dropdown-menu">
+          <button @click="changeStandard($event)" class="dropdown-item" href="#">평점</button>
+          <button @click="changeStandard($event)" class="dropdown-item" href="#">출시일</button>
+        </div>
 
         <div class="row">
             <div v-for="movie in movies" class="card col-3" style="width: 18rem;" :id="getCardId(movie)">
                 <img :src="getMoviePoster(movie)" class="card-img-top">
                 <div class="card-body">
                     <h5 class="card-title">[[ movie.title ]]</h5>
-                    <p class="card-text">Sample</p>
+                    <p v-text="getMovieOverview(movie)" class="card-text"></p>
                     <a :href="getReviewUrl(movie)"><button class="btn btn-info">리뷰 보기</button></a>
                     <a :href="getCreateReviewUrl(movie)"><button class="btn btn-outline-info">리뷰 쓰러 가기</button></a>
                     <button @click="getGenres(movie)" type="button" class="btn btn-primary float-right" data-toggle="modal" :data-target="makeModal(movie)">더보기</button>
@@ -93,6 +99,7 @@
 {% block vue %}
 
     <script>
+        const standardKey = {'평점': 1, '출시일': 2}
         const app = new Vue({
         delimiters: ['[[', ']]'],
         el: '#app',
@@ -104,10 +111,11 @@
             exclude_movies: [],
             later_movies: [],
             temp_genres: [],
+            standard: "평점"
         },
         methods: {
-            getMovies(pageNumber) {
-            axios.get(`/movies/get_movies/${pageNumber}`)
+            getMovies(pageNumber, key) {
+            axios.get(`/movies/get_movies/${pageNumber}/${key}`)
                 .then(res => {
                     this.movies = res.data.movies
                     this.like_movies = res.data.like_movies
@@ -117,6 +125,10 @@
                 .catch(err => {
                     console.log(err)
                 })
+            },
+            changeStandard(event) {
+                this.standard = event.target.outerText
+                this.getMovies(0, standardKey[this.standard])
             },
             movePage(event) {
                 let page = parseInt(event.target.innerText) - 1
@@ -168,6 +180,9 @@
             getCreateReviewUrl(movie) {
                 return `/movies/review_create/${movie.id}`
             },
+            getMovieOverview(movie) {
+                return movie.overview.substr(0, 30) + '...'
+            },
             changeLike(movie, event) {
                 axios.get(`/movies/movie_like/${movie.id}`)
                     .then(res => {
@@ -216,7 +231,7 @@
             },
         },
         created() {
-            this.getMovies(0)
+            this.getMovies(0, 1)
         }
         })
     </script>
