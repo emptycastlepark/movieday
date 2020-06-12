@@ -17,6 +17,7 @@ urlpatterns = [
     path('movie_later/<int:movie_id>/', views.movie_later, name='movie_later'),
 
     path('get_movies/<int:pageNum>/<int:key>/<int:genre_key>/', views.get_movies, name='get_movies'),
+
     path('get_genres/<int:movie_id>/', views.get_genres, name='get_genres'),
     path('get_movie_recommend/<str:weather>/<str:temp>/', views.get_movie_recommend, name='get_movie_recommend'),
 
