@@ -23,6 +23,9 @@ class Movie(models.Model):
     backdrop_path = models.CharField(max_length=50)
     genres = models.ManyToManyField(Genre)
 
+    def __str__(self):
+        return self.title
+
 
 class MovieReview(models.Model):
     content = models.CharField(max_length = 50)
