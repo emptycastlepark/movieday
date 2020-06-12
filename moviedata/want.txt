@@ -1,5 +1,0 @@
-]{"model": "movies.movie", "pk": ____, "fields": {"title": "...", "original_title": "...", ... ", "genres":["", "", ""]}},  
-{"model": "movies.movie", "pk": ____, "fields": {"title": "...", "original_title": "...", ... "}},
-...  
-{"model": "movies.movie", "pk": ____, "fields": {"title": "...", "original_title": "...", ... "}},
-{"model": "movies.movie", "pk": ____, "fields": {"title": "...", "original_title": "...", ... "}}]
