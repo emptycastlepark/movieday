@@ -10,8 +10,6 @@
 
 
 {% block content %}
-
-    <h1>MovieTest</h1>
     <div id="app" class="text-center">
         
         <button type="button" class="btn btn-outline-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">[[ standard ]]</button>
@@ -19,6 +17,27 @@
           <button @click="changeStandard($event)" class="dropdown-item" href="#">평점</button>
           <button @click="changeStandard($event)" class="dropdown-item" href="#">출시일</button>
         </div>
+
+        <ul id="multicol-menu" class="nav pull-right">
+            <li class="dropdown">
+                <button class="btn btn-outline-primary" class="dropdown-toggle" data-toggle="dropdown">[[ genres[genre] ]]</button>
+                <div class="dropdown-menu">
+                    <div class="row" style="width: 500px;">
+                        <p v-for="genre in genres" @click="changeGenre($event)" class="col-3">[[ genre ]]</p>
+                    </div>
+                </div>
+            </li>
+        </ul>
+
+        
+        <div class="dropdown">
+            <button type="button" class="btn btn-outline-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">[[ standards[standard] ]]</button>
+            <div class="dropdown-menu">
+            <button v-for="standard in standards" @click="changeStandard($event)" class="dropdown-item" href="#">[[ standard ]]</button>
+            </div>
+        </div>
+
+
 
         <div class="row">
             <div v-for="movie in movies" class="card col-3" style="width: 18rem;" :id="getCardId(movie)">
@@ -99,7 +118,10 @@
 {% block vue %}
 
     <script>
-        const standardKey = {'평점': 1, '출시일': 2}
+        const standardKey = ['평점', '출시일']
+        const genreKey = ['모두', 'Adventure', 'Fantasy', 'Animation', 'Drama', 'Horror', 'Action', 'Comedy', 'Western', 'Thriller', 'Crime', 'Docu', 'SF',
+                'Mystery', 'Music', 'Romance', 'Family', 'War', 'History', 'TV Movie']
+
         const app = new Vue({
         delimiters: ['[[', ']]'],
         el: '#app',
@@ -111,11 +133,15 @@
             exclude_movies: [],
             later_movies: [],
             temp_genres: [],
-            standard: "평점"
+            standards: standardKey,
+            standard: 0,
+            genres: genreKey,
+            genre: 0,
         },
         methods: {
-            getMovies(pageNumber, key) {
-            axios.get(`/movies/get_movies/${pageNumber}/${key}`)
+            getMovies(pageNumber, key, genre) {
+            axios.get(`/movies/get_movies/${pageNumber}/${key}/${genre}`)
+
                 .then(res => {
                     this.movies = res.data.movies
                     this.like_movies = res.data.like_movies
@@ -127,23 +153,29 @@
                 })
             },
             changeStandard(event) {
-                this.standard = event.target.outerText
-                this.getMovies(0, standardKey[this.standard])
+                this.standard = standardKey.indexOf(event.target.outerText)
+                this.curPageNumber = 0
+                this.getMovies(0, this.standard, this.genre)
+            },
+            changeGenre(event) {
+                this.genre = genreKey.indexOf(event.target.outerText)
+                this.curPageNumber = 0
+                this.getMovies(0, this.standard, this.genre)
             },
             movePage(event) {
                 let page = parseInt(event.target.innerText) - 1
                 this.curPageNumber = page
-                this.getMovies(page)
+                this.getMovies(page, this.standard, this.genre)
                 this.scrollToTop()
             },
             moveFirst() {
                 this.curPageNumber = 0
-                this.getMovies(0)
+                this.getMovies(0, this.standard, this.genre)
                 this.scrollToTop()
             },
             moveLast() {
                 this.curPageNumber = parseInt(this.maxPageNumber)
-                this.getMovies(this.maxPageNumber)
+                this.getMovies(this.maxPageNumber, this.standard, this.genre)
                 this.scrollToTop()
             },
             getMoviePoster(movie) {
@@ -231,7 +263,7 @@
             },
         },
         created() {
-            this.getMovies(0, 1)
+            this.getMovies(0, 0, 0)
         }
         })
     </script>
