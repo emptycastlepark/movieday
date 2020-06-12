@@ -37,8 +37,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+
     # 쿼리 개선용
     'debug_toolbar',
+
+    # allauth
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
 
     # Bootstrap
     'bootstrap4',
@@ -143,7 +151,6 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
-
 import json
 
 from django.core.exceptions import ImproperlyConfigured
@@ -159,9 +166,30 @@ def get_secret(setting, secret=secret):
         raise ImproperlyConfigured(error_msg)
 
 SECRET_KEY_MOVIE_API_KEY = get_secret("SECRET_KEY_MOVIE_API_KEY")
-
 SECRET_KEY_WEATHER_API_KEY = get_secret("SECRET_KEY_WEATHER_API_KEY")
 
 INTERNAL_IPS = [
     '127.0.0.1',
 ]
+
+# allauth setting
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
+
+SITE_ID = 1
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE' : [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
+    }
+}
+
+LOGIN_REDIRECT_URL = '/movies/'

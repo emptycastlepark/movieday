@@ -22,7 +22,6 @@ def index(request):
 
 def movie_list(request):
     movie_cnt = Movie.objects.exclude(id__in=request.user.exclude_movies.all()).count() // 16
-    print(movie_cnt)
     context = {
         'movie_cnt': movie_cnt
     }
@@ -155,11 +154,14 @@ def review_create_withoutmovie(request):
     return render(request, 'movies/review_create.html', context)
 
 
-def get_movies(request, pageNum):
+def get_movies(request, pageNum, key):
     like_movies = list(request.user.like_movies.values_list('id', flat=True))
     exclude_movies = list(request.user.exclude_movies.values_list('id', flat=True))
     later_movies = list(request.user.later_movies.values_list('id', flat=True))
-    movies = list(Movie.objects.exclude(id__in=request.user.exclude_movies.all()).values())[pageNum*16:(pageNum+1)*16]
+    if key == 1:
+        movies = list(Movie.objects.exclude(id__in=request.user.exclude_movies.all()).order_by('-vote_average').values())[pageNum*16:(pageNum+1)*16]
+    elif key == 2:
+        movies = list(Movie.objects.exclude(id__in=request.user.exclude_movies.all()).order_by('-release_date').values())[pageNum*16:(pageNum+1)*16]
     return JsonResponse({'movies': movies, 'like_movies': like_movies, 'exclude_movies': exclude_movies, 'later_movies': later_movies}, status = 200)
 
 
@@ -186,7 +188,6 @@ def get_movie_recommend(request, weather, temp):
 
 
 def movie_like(request, movie_id):
-    print(1)
     user = request.user
     movie = get_object_or_404(Movie, id=movie_id)
 
