@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+{% load static %}
+
+{% block content %}
+  <h1>제목: {{ article.title }}</h1>
+  <h3>내용: {{ article.content }}</h3>
+  <h5>작성자: {{article.author }}</h5>
+  <p>작성일자: {{ article.created_at }}</p>
+  <p>수정일자: {{ article.updated_at }}</p>
+  <span id="like-count-{{ article.pk }}">{{ article.like_users.all|length }}</span>명이 이 글을 좋아합니다.<br>
+  {% if request.user != article.author %}
+    {% if user in article.like_users.all %}
+      <i data-id="{{ article.pk }}" class="fas fa-heart fa-lg like-button" style="color:crimson; cursor: pointer;"></i>
+    {% else %}
+      <i data-id="{{ article.pk }}" class="fas fa-heart fa-lg like-button" style="color:black; cursor: pointer;"></i>
+    {% endif %}
+  {% else %}
+    <form action="{% url 'community:delete' article.pk %}" method='POST'>
+      {% csrf_token %}
+      <button>삭제하기</button>
+    </form>
+    <a href="{% url 'community:update' article.pk %}">수정하기</a>
+  {% endif %}
+  <form action="{% url 'community:comment_create' article.pk %}" method='POST'>
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    <button>댓글작성</button>
+  </form>
+  <br>
+  <p>댓글보기</p>
+  {% for comment in article.comment_set.all %}
+    <h5>{{ comment.content }}</h5>
+    <p>{{ comment.author }}</p>
+    {% if request.user == comment.author %}
+      <form action="{% url 'community:comment_delete' article.pk comment.pk %}" method='POST'>
+        {% csrf_token %}
+        <button>삭제하기</button>
+      </form>
+    {% endif %}
+  {% endfor %}
+  <script>
+    const likeButtons = document.querySelectorAll('.like-button')
+    likeButtons.forEach(function(likeButton) {
+      likeButton.addEventListener('click', function(event) {
+        const articleId = event.target.dataset.id
+        axios.get(`/community/${articleId}/like/`)
+          .then(response => {
+            if (response.data.liked) {
+              event.target.style.color = 'crimson'
+            } else {
+              event.target.style.color = 'black'
+            }
+            document.querySelector(`#like-count-${articleId}`).innerText = response.data.like_count
+          })
+          .catch(error => {
+            console.log(error)
+          })
+      })
+    })
+  </script>
+{% endblock %}
