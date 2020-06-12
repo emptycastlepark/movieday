@@ -154,14 +154,22 @@ def review_create_withoutmovie(request):
     return render(request, 'movies/review_create.html', context)
 
 
-def get_movies(request, pageNum, key):
+def get_movies(request, pageNum, key, genre_key):
     like_movies = list(request.user.like_movies.values_list('id', flat=True))
     exclude_movies = list(request.user.exclude_movies.values_list('id', flat=True))
     later_movies = list(request.user.later_movies.values_list('id', flat=True))
-    if key == 1:
-        movies = list(Movie.objects.exclude(id__in=request.user.exclude_movies.all()).order_by('-vote_average').values())[pageNum*16:(pageNum+1)*16]
-    elif key == 2:
-        movies = list(Movie.objects.exclude(id__in=request.user.exclude_movies.all()).order_by('-release_date').values())[pageNum*16:(pageNum+1)*16]
+    genre_name = [None, 'Adventure', 'Fantasy', 'Animation', 'Drama', 'Horror', 'Action', 'Comedy', 'Western', 'Thriller', 'Crime', 'Docu', 'SF',
+                'Mystery', 'Music', 'Romance', 'Family', 'War', 'History', 'TV Movie']
+
+    if genre_key == 0:
+        genre_movies = Movie.objects.exclude(id__in=request.user.exclude_movies.all())
+    else:
+        genre_movies = Genre.objects.get(name=genre_name[genre_key]).movie_set.exclude(id__in=request.user.exclude_movies.all())
+
+    if key == 0:
+        movies = list(genre_movies.order_by('-vote_average').values())[pageNum*16:(pageNum+1)*16]
+    elif key == 1:
+        movies = list(genre_movies.order_by('-release_date').values())[pageNum*16:(pageNum+1)*16]
     return JsonResponse({'movies': movies, 'like_movies': like_movies, 'exclude_movies': exclude_movies, 'later_movies': later_movies}, status = 200)
 
 
