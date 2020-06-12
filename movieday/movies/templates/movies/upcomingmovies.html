@@ -8,35 +8,70 @@
 
 
 {% block content %}
-<h1>Hello</h1>
 
 
 <!-- 이하 Vue 인스턴스 사용할 계획 -->
     <div id="app">
-        <div class="main">
-            <table id="calendar" align="center">
-                <thead>
-                    <tr class="btn-wrap clearfix">
-                        <td>
-                            <button @click="movePrev" id="prev"><</button>
-                        </td>
-                        <td align="center" id="current-year-month" colspan="5">[[ year ]]년 [[ month+1 ]]월</td>
-                        <td>
-                            <button @click="moveNext" id="next">></button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class = "sun" align="center">Sun</td>
-                        <td class="mon" align="center">Mon</td>
-                        <td class="tue" align="center">Tue</td>
-                        <td class="wed" align="center">Wed</td>
-                        <td class="thu" align="center">Thu</td>
-                        <td class="fri" align="center">Fri</td>
-                        <td class= "sat" align="center">Sat</td>
-                    </tr>
-                </thead>
-                <tbody id="calendar-body" class="calendar-body"></tbody>
-            </table>
+        <h1>상영 예정 영화 (총 [[ countMovies ]]개)</h1>
+        <div v-if="isList">
+            <button @click="changeComponent" class="btn btn-primary">캘린더로 보기</button>
+            <div class="row">
+                <div v-for="upcomingMovie in upcomingMovies" class="card col-3" style="width: 18rem;">
+                    <img :src="getPosterUrl(upcomingMovie)" class="card-img-top">
+                    <div class="card-body">
+                        <h5 class="card-title">[[ upcomingMovie.title ]]</h5>
+                        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                        <button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#modal-{{ movie.pk }}">더보기</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div v-else>
+            <button @click="changeComponent" class="btn btn-primary">리스트로 보기</button>
+            <div class="row">
+                <button v-if="!isFirstMonth" @click="movePrev" id="prev" class="btn btn-outline-primary col-2"><</button>
+                <div v-else class="col-2"></div>
+                <h3 id="current-year-month" class="col-8 text-center">[[ year ]]년 [[ month+1 ]]월</h3>
+                <button v-if="!isLastMonth" @click="moveNext" id="next" class="btn btn-outline-primary col-2">></button>
+                <div v-else class="col-2"></div>
+                
+                <div v-for="upcomingMovie in upcomingMonth" class="card col-3" style="width: 18rem;">
+                    <img :src="getPosterUrl(upcomingMovie)" class="card-img-top">
+                    <div class="card-body">
+                        <h5 class="card-title">[[ upcomingMovie.title ]]</h5>
+                        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                        <button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#modal-{{ movie.pk }}">더보기</button>
+                    </div>
+                </div>
+                <div v-if="upcomingMonth.length == 0" ><h2>개봉 예정 영화가 없습니다.</h2></div>
+            </div>
+
+            <div class="main">
+                <table id="calendar" align="center">
+                    <thead>
+                        <tr class="btn-wrap clearfix">
+                            <td>
+                                <button v-if="!isFirstMonth" @click="movePrev" id="prev"><</button>
+                            </td>
+                            <td align="center" id="current-year-month" colspan="5">[[ year ]]년 [[ month+1 ]]월</td>
+                            <td>
+                                <button v-if="!isLastMonth" @click="moveNext" id="next">></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class = "sun" align="center">Sun</td>
+                            <td class="mon" align="center">Mon</td>
+                            <td class="tue" align="center">Tue</td>
+                            <td class="wed" align="center">Wed</td>
+                            <td class="thu" align="center">Thu</td>
+                            <td class="fri" align="center">Fri</td>
+                            <td class= "sat" align="center">Sat</td>
+                        </tr>
+                    </thead>
+                    <tbody id="calendar-body" class="calendar-body"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 {% endblock %}
@@ -49,7 +84,6 @@
     const monthList = ['January','February','March','April','May','June','July','August','September','October','November','December']
     const leapYear=[31,29,31,30,31,30,31,31,30,31,30,31]
     const notLeapYear=[31,28,31,30,31,30,31,31,30,31,30,31]
-
     const today = new Date();
 
     const app = new Vue({
@@ -60,10 +94,26 @@
         month: today.getMonth(),
         day: 1,
         isLeapYear: null,
+        upcomingMovies: [],
+        MOVIE_API_KEY: "{{ MOVIE_API_KEY }}",
+        isList: true,
+        lastYear: 0,
+        lastMonth: 0,
+        upcomingMonth: [],
       },
       methods: {
+        changeComponent() {
+            this.isList = !this.isList   
+            for (let number=0; number<this.upcomingMovies.length; number++) {
+                temp_date = this.upcomingMovies[number].release_date.split("-")
+                if ((temp_date[0] > this.lastYear) && (temp_date[1] > this.lastMonth)) {
+                    this.lastYear = temp_date[0]
+                    this.lastMonth = temp_date[1]
+                }
+            }
+            this.changeMonth()
+        },
         makeCalendar() {
-          console.log(this.year, this.month)
           let currentTitle = document.getElementById('current-year-month');
           let calendarBody = document.getElementById('calendar-body');
           let pageFirst = new Date(this.year, this.month, 1);
@@ -106,6 +156,7 @@
             this.year -= 1
           }
           this.makeCalendar()
+          this.changeMonth()
         },
         moveNext() {
           this.removeCalendar()
@@ -115,6 +166,65 @@
             this.year += 1
           }
           this.makeCalendar()
+          this.changeMonth()
+        },
+        getUpcomingMovies(month, date) {
+            let formatedmonth = 0
+            let formateddate = 0
+
+            if (month < 9) {
+                formatedmonth = '0' + (month+1)
+            } else {
+                formatedmonth = (month+1)
+            }
+
+            if (date < 9) {
+                formateddate = '0' + date
+            } else {
+                formateddate = date
+            }
+
+            const movieUrlAll = `https://api.themoviedb.org/3/discover/movie?api_key=${this.MOVIE_API_KEY}&language=ko-KR&region=KR&page=1&primary_release_date.gte=${this.year}-${formatedmonth}-${formateddate}`
+            axios.get(movieUrlAll)
+                .then(res => {
+                    let totalPage = res.data.total_pages
+                    this.upcomingMovies = [...this.upcomingMovies, ...res.data.results]
+                    for (let page=2; page<=totalPage; page++) {
+                        let movieUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${this.MOVIE_API_KEY}&language=ko-KR&region=KR&page=${page}&primary_release_date.gte=${this.year}-${formatedmonth}-${formateddate}`
+                        axios.get(movieUrl)
+                        .then(res => {
+                            this.upcomingMovies = [...this.upcomingMovies, ...res.data.results]
+                        })
+                    }
+                })
+                .catch(err => console.log(err))
+        },
+        getPosterUrl(movie) {
+            if (movie.poster_path == null) {
+                return `/static/movies/no_poster.jpg`
+            } else {
+                return `https://image.tmdb.org/t/p/original/${movie.poster_path}`
+            }
+        },
+        changeMonth() {
+            this.upcomingMonth = []
+            for (let number=0; number<this.upcomingMovies.length; number++) {
+                movie_date = this.upcomingMovies[number].release_date.split("-")
+                if ((this.month+1 == movie_date[1]) && (this.year == movie_date[0])) {
+                    this.upcomingMonth.push(this.upcomingMovies[number])
+                }
+            }
+        }
+      },
+      computed: {
+        countMovies() {
+            return this.upcomingMovies.length
+        },
+        isFirstMonth() {
+            return (today.getMonth()==this.month) && (today.getFullYear()==this.year)
+        },
+        isLastMonth() {
+            return (this.month+1==this.lastMonth) && (this.year==this.lastYear)
         }
       },
       created() {
@@ -123,9 +233,10 @@
         } else {
           this.isLeapYear = notLeapYear
         }
+        this.makeCalendar()
       },
       mounted() {
-        this.makeCalendar()
+        this.getUpcomingMovies(today.getMonth(), today.getDate())
       }
     })
 </script>

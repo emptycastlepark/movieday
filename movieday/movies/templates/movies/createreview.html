@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+
+{% block content %}
+    {% if request.resolver_match.url_name == 'createreview' %}
+        <h1>{{ movie }} 리뷰 작성 중</h1>
+    {% else %}
+        <h1>리뷰 작성</h1>
+    {% endif %}
+    <form action="" method="POST">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <button class="btn btn-primary">작성 완료</button>
+    </form>
+{% endblock %}

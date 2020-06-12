@@ -1,0 +1,15 @@
+Thunderstorm / 뇌우
+Drizzle / 이슬비
+Rain / 비
+Snow / 눈
+Mist / 박무
+Haze / 연무
+Dust / 먼지
+Fog / 안개
+Squall / 돌풍
+Tornado / 폭풍
+Clear / 맑은
+Clouds / 구름낀
+Smoke
+Sand
+Ash
