@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.decorators import login_required
 
-from movieday.settings import SECRET_KEY_WEATHER_API_KEY, SECRET_KEY_MOVIE_API_KEY
+from movieday.settings import SECRET_KEY_WEATHER_API_KEY, SECRET_KEY_MOVIE_API_KEY, SECRET_KEY_KOBIS_API_KEY
 from .models import Movie, Genre, MovieReview
 from .forms import MovieReviewForm, MovieReviewWithoutMovieForm
 
@@ -179,6 +179,26 @@ def get_genres(request, movie_id):
     return JsonResponse({'genres': genres}, status = 200)
 
 
+def get_reviews(request, movie_id):
+    reviews = list(get_object_or_404(Movie, id=movie_id).moviereview_set.all().order_by('-created_at')[:5].values_list('content', flat=True))
+    return JsonResponse({'reviews': reviews}, status = 200)
+
+def make_review(request, movie_id):
+    movie = get_object_or_404(Movie, id=movie_id)
+
+    form = MovieReviewForm()
+
+    review = form.save(commit=False)
+    review.content = request.GET.get('content')
+    review.author = request.user
+    review.movie = movie
+    review.save()
+
+    review = review.serializable_value('content')
+
+    return JsonResponse({'review': review}, status = 200)
+
+
 def get_movie_recommend(request, weather, temp):
     recommend_genre = []
     if (float(temp) >= 25):
@@ -250,6 +270,6 @@ def helper_function(input_list):
 
 def testing(request):
     context = {
-        'MOVIE_API_KEY': SECRET_KEY_MOVIE_API_KEY
+        'SECRET_KEY_KOBIS_API_KEY': SECRET_KEY_KOBIS_API_KEY
     }
     return render(request, 'movies/testing.html', context)

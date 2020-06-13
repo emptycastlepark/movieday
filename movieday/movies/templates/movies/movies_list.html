@@ -61,22 +61,37 @@
                             </div>
                             <img :src="getMoviePoster(movie)" class="card-img-top" alt="...">
                             <div class="modal-body">
-                            <button class='btn btn-outline-success float-right'>[[ movie.vote_average ]]</button>
-                            <p>개봉일 : [[ movie.release_date ]]</p>
-                            <hr>
-                            [[ movie.like_users ]]
+                                <button class='btn btn-outline-success float-right'>[[ movie.vote_average ]]</button>
+                                <p>개봉일 : [[ movie.release_date ]]</p>
+                                <hr>
+                                [[ movie.like_users ]]
 
-                            <i v-if="checkLike(movie)" @click="changeLike(movie, $event)" class="fas fa-heart" style="color:red;" data-dismiss="modal">좋아요 취소</i>
-                            <i v-else class="fas fa-heart" @click="changeLike(movie, $event)" style="color:black;">좋아요</i>
+                                <i v-if="checkLike(movie)" @click="changeLike(movie, $event)" class="fas fa-heart" style="color:red;" data-dismiss="modal">좋아요 취소</i>
+                                <i v-else class="fas fa-heart" @click="changeLike(movie, $event)" style="color:black;">좋아요</i>
 
-                            <h3>줄거리</h3>
-                            <p>[[ movie.overview ]]</p>
-                            
-                            <button v-for="genre in temp_genres" type="button" class="btn btn-outline-secondary animated infinite swing delay-1s slow">[[ genre ]]</button>
-                            <!-- {% for genre in movie.genres.all %}
-                                <button type="button" class="btn btn-outline-secondary animated infinite swing delay-1s slow">{{ genre.name }}</button>
-                            {% endfor %} -->
+                                <h3>줄거리</h3>
+                                <p>[[ movie.overview ]]</p>
+                                
+                                <button v-for="genre in temp_genres" type="button" class="btn btn-outline-secondary animated infinite swing delay-1s slow">[[ genre ]]</button>
+                                <!-- {% for genre in movie.genres.all %}
+                                    <button type="button" class="btn btn-outline-secondary animated infinite swing delay-1s slow">{{ genre.name }}</button>
+                                {% endfor %} -->
+                                
+                                <h2 class="text-left">리뷰 위치</h2>
+                                <ul class="text-left">
+                                    <li v-if="reviews.length == 0">작성된 리뷰가 없습니다.</li>
+                                    <li v-else v-for="review in reviews">[[ review ]]</li>
+                                </ul>
+
+                                <h2>리뷰 작성용 위치</h2>
+                                <div class="input-group mb-3">
+                                    <input v-model="reviewInput" type="text" class="form-control" placeholder="간단 리뷰 작성하기" aria-label="Recipient's username" aria-describedby="button-addon">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary" type="button" id="button-addon" @click="makeReview(movie)">작성</button>
+                                    </div>
+                                </div>                              
                             </div>
+
                             <div class="modal-footer">
                     
                             <button v-if="checkExclude(movie)" @click="changeExclude(movie, $event)" type="button" class="btn btn-danger exclude-buttons" data-dismiss="modal">실행 취소</button>
@@ -137,6 +152,8 @@
             standard: 0,
             genres: genreKey,
             genre: 0,
+            reviews: [],
+            reviewInput: null,
         },
         methods: {
             getMovies(pageNumber, key, genre) {
@@ -203,6 +220,26 @@
                 axios.get(`/movies/get_genres/${movie.id}`)
                     .then(res => {
                         this.temp_genres = res.data.genres.slice()
+                        this.getReviews(movie)
+                    })
+                    .catch(err => console.log(err))
+            },
+            getReviews(movie) {
+                axios.get(`/movies/get_reviews/${movie.id}`)
+                    .then(response => {
+                        this.reviews = response.data.reviews
+                    })
+                    .catch(err => console.log(err))
+            },
+            makeReview(movie) {
+                console.log(1)
+                axios.get(`/movies/make_review/${movie.id}/`, {
+                    params: {
+                        content: this.reviewInput
+                    }})
+                    .then(res => {
+                        this.reviews = [...[res.data.review], ...this.reviews]
+                        this.reviewInput = ''
                     })
                     .catch(err => console.log(err))
             },
