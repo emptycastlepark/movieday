@@ -11,6 +11,12 @@
 
 {% block content %}
     <div id="app" class="text-center">
+        
+        <button type="button" class="btn btn-outline-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">[[ standard ]]</button>
+        <div class="dropdown-menu">
+          <button @click="changeStandard($event)" class="dropdown-item" href="#">평점</button>
+          <button @click="changeStandard($event)" class="dropdown-item" href="#">출시일</button>
+        </div>
 
         <ul id="multicol-menu" class="nav pull-right">
             <li class="dropdown">
@@ -152,6 +158,7 @@
         methods: {
             getMovies(pageNumber, key, genre) {
             axios.get(`/movies/get_movies/${pageNumber}/${key}/${genre}`)
+
                 .then(res => {
                     this.movies = res.data.movies
                     this.like_movies = res.data.like_movies

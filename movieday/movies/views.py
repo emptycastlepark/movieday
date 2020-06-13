@@ -170,6 +170,7 @@ def get_movies(request, pageNum, key, genre_key):
         movies = list(genre_movies.order_by('-vote_average').values())[pageNum*16:(pageNum+1)*16]
     elif key == 1:
         movies = list(genre_movies.order_by('-release_date').values())[pageNum*16:(pageNum+1)*16]
+
     return JsonResponse({'movies': movies, 'like_movies': like_movies, 'exclude_movies': exclude_movies, 'later_movies': later_movies}, status = 200)
 
 
