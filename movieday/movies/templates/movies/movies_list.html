@@ -11,7 +11,7 @@
 
 {% block content %}
     <div id="app" class="text-center">
-        
+
         <div class="menu-toggle d-flex justify-content-around">
             <ul id="multicol-menu" class="nav pull-right">
                 <li class="dropdown">
@@ -24,12 +24,16 @@
                 </li>
             </ul>
 
-            
-            <div class="dropdown">
+            <div v-if="!isSearching" class="dropdown float-right">
                 <button type="button" class="btn btn-outline-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">[[ standards[standard] ]]</button>
                 <div class="dropdown-menu">
                 <button v-for="standard in standards" @click="changeStandard($event)" class="dropdown-item" href="#">[[ standard ]]</button>
                 </div>
+            </div>
+
+            <div>
+                <i class="fas fa-search"></i> <input @keyup.enter="searchMovie" type="text" v-model="searchInput">
+                <button @click="searchMovie" class="btn btn-outline-primary">검색</button>
             </div>
         </div>
 
@@ -41,9 +45,8 @@
                 <div class="card-body">
                     <h5 class="card-title">[[ movie.title ]]</h5>
                     <p v-text="getMovieOverview(movie)" class="card-text"></p>
-                    <a :href="getReviewUrl(movie)" class="d-inline-block"><button class="btn btn-info">리뷰 보기</button></a>
-                    <a :href="getCreateReviewUrl(movie)" class="d-inline-block"><button class="btn btn-outline-info">리뷰 쓰기</button></a>
-                    <button @click="getGenres(movie)" type="button" class="btn btn-primary float-right my-3" data-toggle="modal" :data-target="makeModal(movie)">더보기</button>
+                    <a :href="getReviewUrl(movie)" class="float-left"><button class="btn btn-info">리뷰 보기</button></a>
+                    <button @click="getGenres(movie)" type="button" class="btn btn-primary float-right" data-toggle="modal" :data-target="makeModal(movie)">더보기</button>
                 </div>
 
                 <div class="modal fade bd-example-modal-xl" :id="getModal(movie)" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
@@ -116,14 +119,29 @@
         </div>
 
 
-        <div class="btn btn-group">
-            <button @click="moveFirst" v-if="curPageNumber != 0" class="btn btn-outline-primary">처음으로</button>
-            <button @click="movePage" v-if="curPageNumber - 1 > 0" class="btn btn-outline-primary">[[ curPageNumber - 1 ]]</button>
-            <button @click="movePage" v-if="curPageNumber > 0" class="btn btn-outline-primary">[[ curPageNumber ]]</button>
-            <button @click="movePage" class="btn btn-primary">[[ curPageNumber + 1 ]]</button>
-            <button @click="movePage" v-if="curPageNumber < maxPageNumber" class="btn btn-outline-primary">[[ curPageNumber + 2 ]]</button>
-            <button @click="movePage" v-if="curPageNumber + 1 < maxPageNumber" class="btn btn-outline-primary">[[ curPageNumber + 3 ]]</button>
-            <button @click="moveLast" v-if="curPageNumber != maxPageNumber" class="btn btn-outline-primary">마지막으로</button>
+        <div v-if="!isSearching">
+            <div class="btn btn-group">
+                <button @click="moveFirst" v-if="curPageNumber != 0" class="btn btn-outline-primary">처음으로</button>
+                <button @click="movePage" v-if="curPageNumber - 1 > 0" class="btn btn-outline-primary">[[ curPageNumber - 1 ]]</button>
+                <button @click="movePage" v-if="curPageNumber > 0" class="btn btn-outline-primary">[[ curPageNumber ]]</button>
+                <button @click="movePage" class="btn btn-primary">[[ curPageNumber + 1 ]]</button>
+                <button @click="movePage" v-if="curPageNumber < maxPageNumber" class="btn btn-outline-primary">[[ curPageNumber + 2 ]]</button>
+                <button @click="movePage" v-if="curPageNumber + 1 < maxPageNumber" class="btn btn-outline-primary">[[ curPageNumber + 3 ]]</button>
+                <button @click="moveLast" v-if="curPageNumber != maxPageNumber" class="btn btn-outline-primary">마지막으로</button>
+            </div>
+        </div>
+
+        
+        <div v-else>
+            <div class="btn btn-group">
+                <button @click="moveSearchingPage" v-if="curPageNumber != 0" class="btn btn-outline-primary">1</button>
+                <button @click="moveSearchingPage" v-if="curPageNumber - 1 > 0" class="btn btn-outline-primary">[[ curPageNumber - 1 ]]</button>
+                <button @click="moveSearchingPage" v-if="curPageNumber > 0" class="btn btn-outline-primary">[[ curPageNumber ]]</button>
+                <button @click="moveSearchingPage" class="btn btn-primary">[[ curPageNumber + 1 ]]</button>
+                <button @click="moveSearchingPage" v-if="curPageNumber < maxPageNumber" class="btn btn-outline-primary">[[ curPageNumber + 2 ]]</button>
+                <button @click="moveSearchingPage" v-if="curPageNumber + 1 < maxPageNumber" class="btn btn-outline-primary">[[ curPageNumber + 3 ]]</button>
+                <button @click="moveSearchingPage" v-if="curPageNumber != maxPageNumber" class="btn btn-outline-primary">[[ maxPageNumber + 1 ]]</button>
+            </div>
         </div>
     </div>
 {% endblock %}
@@ -155,17 +173,20 @@
             reviews: [],
             reviewInput: null,
             reviewScore: 0,
+            searchInput: null,
+            realSearching: null,
+            isSearching: false,
         },
         methods: {
             getMovies(pageNumber, key, genre) {
             axios.get(`/movies/get_movies/${pageNumber}/${key}/${genre}`)
-
                 .then(res => {
                     this.movies = res.data.movies
                     this.like_movies = res.data.like_movies
                     this.exclude_movies = res.data.exclude_movies
                     this.later_movies = res.data.later_movies
                     this.maxPageNumber = res.data.max_page
+                    this.isSearching = false
                 })
                 .catch(err => {
                     console.log(err)
@@ -180,6 +201,26 @@
                 this.genre = genreKey.indexOf(event.target.outerText)
                 this.curPageNumber = 0
                 this.getMovies(0, this.standard, this.genre)
+            },
+            searchMovie() {
+                this.realSearching = this.searchInput
+                this.searchMovieProcess(0)
+                this.searchInput = ''
+                this.isSearching = true
+            },
+            searchMovieProcess(pageNumber) {
+                axios.get(`/movies/search_movies/${this.realSearching}/${pageNumber}`)
+                    .then(res => {
+                        this.movies = res.data.movies
+                        this.maxPageNumber = res.data.max_page
+                    })
+                    .catch(err => console.log(err))
+            },
+            moveSearchingPage(event) {
+                let page = parseInt(event.target.innerText) - 1
+                this.curPageNumber = page
+                this.searchMovieProcess(page)
+                this.scrollToTop()
             },
             movePage(event) {
                 let page = parseInt(event.target.innerText) - 1
@@ -240,7 +281,6 @@
                         score: this.reviewScore
                     }})
                     .then(res => {
-                        console.log(res)
                         if (res.data.result == 'success') {
                             this.reviews = [...[res.data.review], ...this.reviews]
                         } else if (res.data.result == 'false') {
@@ -252,14 +292,12 @@
                             }
                         }
                         this.reviewInput = ''
+                        this.reviewScore = 0
                     })
                     .catch(err => console.log(err))
             },
             getReviewUrl(movie) {
                 return `/movies/review_list_movie/${movie.id}`
-            },
-            getCreateReviewUrl(movie) {
-                return `/movies/review_create/${movie.id}`
             },
             getMovieOverview(movie) {
                 return movie.overview.substr(0, 30) + '...'
