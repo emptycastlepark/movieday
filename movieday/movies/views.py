@@ -3,7 +3,8 @@ from django.template.defaulttags import register
 from django.http import JsonResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.decorators import login_required
-from django.db.models import Avg
+from django.db.models import Avg, Q
+from django.contrib import messages
 
 from movieday.settings import SECRET_KEY_WEATHER_API_KEY, SECRET_KEY_MOVIE_API_KEY, SECRET_KEY_KOBIS_API_KEY
 from .models import Movie, Genre, MovieReview
@@ -138,8 +139,12 @@ def review_detail(request, review_id):
     return render(request, 'movies/review_detail.html', context)
 
 @login_required
-def review_create(request, movie_id):    
+def review_create(request, movie_id):
     movie = get_object_or_404(Movie, id=movie_id)
+    if movie.id in request.user.moviereview_set.all().values_list('movie', flat=True):
+        review = movie.moviereview_set.get(author=request.user)
+        messages.warning(request, '이미 리뷰를 작성한 영화입니다.', extra_tags=review.id)
+        return redirect('movies:review_list')
     if request.method == 'POST':
         form = MovieReviewForm(request.POST)
         if form.is_valid():
@@ -160,6 +165,11 @@ def review_create(request, movie_id):
 @login_required
 def review_create_withoutmovie(request):
     if request.method == 'POST':
+        movie = get_object_or_404(Movie, id=request.POST['movie'])
+        if movie.id in request.user.moviereview_set.all().values_list('movie', flat=True):
+            review = movie.moviereview_set.get(author=request.user)
+            messages.warning(request, '이미 리뷰를 작성한 영화입니다.', extra_tags=review.id)
+            return redirect('movies:review_list')
         form = MovieReviewWithoutMovieForm(request.POST)
         if form.is_valid():
             review = form.save(commit=False)
@@ -197,11 +207,22 @@ def get_movies(request, pageNum, key, genre_key):
 
     return JsonResponse({'movies': movies, 'like_movies': like_movies, 'exclude_movies': exclude_movies, 'later_movies': later_movies, 'max_page': max_page}, status = 200)
 
+def search_movies(request, searchInput, pageNum):
+    entire_movies = list(Movie.objects.filter(Q(title__contains=searchInput) | Q(original_title__contains=searchInput)).values())
+
+    max_page = len(entire_movies) // 16
+    if len(entire_movies) % 16 == 0:
+        max_page -= 1
+
+    movies = entire_movies[pageNum*16:(pageNum+1)*16]
+    
+    print(searchInput)
+    return JsonResponse({'movies': movies, 'max_page': max_page}, status = 200)
+
 
 def get_genres(request, movie_id):
     genres = list(get_object_or_404(Movie, id=movie_id).genres.all().values_list('name', flat=True))
     return JsonResponse({'genres': genres}, status = 200)
-
 
 def get_reviews(request, movie_id):
     reviews = list(get_object_or_404(Movie, id=movie_id).moviereview_set.all().order_by('-created_at')[:5].values_list('content', flat=True))
@@ -236,10 +257,54 @@ def make_review(request, movie_id):
 
 def get_movie_recommend(request, weather, temp):
     recommend_genre = []
-    if (float(temp) >= 25):
-        recommend_genre.append(["오늘 같이 더운 날, ", ["Horror", "Thriller"]])
-    if (weather == "Clouds"):
-        recommend_genre.append(["흐린 날엔 ", ["Crime", "Mystery"]])
+
+    if (float(temp) < 0):
+        recommend_genre.append(["날씨가 매우 춥네요~, ", ["Science Fiction", "War"]])
+    elif (0 <= float(temp) < 5):
+        recommend_genre.append(["겨울이 다가오는 것 같군요, ", ["Fantasy", "Animation"]])
+    elif (5 <= float(temp) < 10):
+        recommend_genre.append(["날씨가 제법 쌀쌀하군요, ", ["Drama", "Comedy"]])
+    elif (10 <= float(temp) < 15):
+        recommend_genre.append(["조금 쌀쌀하지만 시원한 날씨입니다. ", ["Crime", "Mystery"]])
+    elif (15 <= float(temp) < 20):
+        recommend_genre.append(["날씨가 시원하네요~, ", ["Romance", "Music"]])
+    elif (20 <= float(temp) < 25):
+        recommend_genre.append(["야외활동하기 매우 좋은 날씨입니다. ", ["Adventure", "Action", "Western"]])
+    elif (25 <= float(temp) < 30):
+        recommend_genre.append(["여름이 다가오는 것 같군요, ", ["Documentary", "Family"]])
+    elif (30 <= float(temp)):
+        recommend_genre.append(["날씨가 덥네요~, ", ["Horror", "Thriller"]])
+
+    if (weather == "Thunderstorm"):
+        recommend_genre.append(["천둥번개 치는 날, ", ["Horror", "Thriller"]])
+    elif (weather == "Drizzle"):
+        recommend_genre.append(["이슬비가 내리는 날, ", ["Drama", "Music"]])
+    elif (weather == "Rain"):
+        recommend_genre.append(["비가 많이 내리는 날, ", ["Crime", "Thriller"]])
+    elif (weather == "Snow"):
+        recommend_genre.append(["눈이 내리는 날, ", ["Romance", "Fantasy"]])
+    elif (weather == "Mist"):
+        recommend_genre.append(["안개가 옅게 낀 날, ", ["Mystery", "Music"]])
+    elif (weather == "Haze"):
+        recommend_genre.append(["먼지가 많고 흐린 날, ", ["Documentary", "Science Fiction"]])
+    elif (weather == "Dust"):
+        recommend_genre.append(["먼지가 많은 날, ", ["Adventure", "Western"]])
+    elif (weather == "Fog"):
+        recommend_genre.append(["안개가 짙은 날, ", ["Crime", "Mystery"]])
+    elif (weather == "Squall"):
+        recommend_genre.append(["바람이 강한 날, ", ["Adventure", "War"]])
+    elif (weather == "Tornado"):
+        recommend_genre.append(["태풍부는 날, ", ["Documentary", "Science Fiction"]])
+    elif (weather == "Clear"):
+        recommend_genre.append(["맑은 날, ", ["Romance", "Family"]])
+    elif (weather == "Clouds"):
+        recommend_genre.append(["구름낀 날,", ["Animation", "Family"]])
+    elif (weather == "Smoke"):
+        recommend_genre.append(["구름이 짙은 날, ", ["Drama", "Action"]])
+    elif (weather == "Sand"):
+        recommend_genre.append(["황사가 부는 날, ", ["Western", "War"]])
+    elif (weather == "Ash"):
+        recommend_genre.append(["매우 흐린 날, ", ["Comedy", "Action"]])
 
     final_recommend = random.choice(recommend_genre)
 

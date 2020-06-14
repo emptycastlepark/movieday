@@ -18,6 +18,7 @@ urlpatterns = [
     path('movie_later/<int:movie_id>/', views.movie_later, name='movie_later'),
 
     path('get_movies/<int:pageNum>/<int:key>/<int:genre_key>/', views.get_movies, name='get_movies'),
+    path('search_movies/<str:searchInput>/<int:pageNum>/', views.search_movies, name='search_movies'),
 
     path('get_genres/<int:movie_id>/', views.get_genres, name='get_genres'),
     path('get_reviews/<int:movie_id>/', views.get_reviews, name='get_reviews'),

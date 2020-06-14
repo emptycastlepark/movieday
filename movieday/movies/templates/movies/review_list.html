@@ -11,6 +11,12 @@
 {% block content %}
     <div id="app">
 
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-danger" role="alert">{{ message }} 기존 리뷰로 이동하시려면 <a href="{% url 'movies:review_detail' message.extra_tags %}">여기</a>를 클릭해주세요.</div>
+            {% endfor %}
+        {% endif %}
+        
         <div class="row">
             <div class="col-3">
                 <h1> 2위 </h1>
@@ -38,7 +44,7 @@
 
         <ul>
             {% for review in page_obj %}
-                <li><a href="" class="text-decoration-none" data-toggle="modal" data-target="#modal-{{review.movie_id}}">{{ review.movie }}</a> - {{ review.content }}</li>
+                <li><a href="" class="text-decoration-none" data-toggle="modal" data-target="#modal-{{review.movie_id}}">{{ review.movie }}</a> - {{ review.content }} - {{review.score }}</li>
                 
                 <div class="modal fade" id="modal-{{review.movie_id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
