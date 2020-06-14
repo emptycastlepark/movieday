@@ -12,118 +12,118 @@
 {% block content %}
     <div id="app" class="text-center">
         
-        <button type="button" class="btn btn-outline-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">[[ standard ]]</button>
-        <div class="dropdown-menu">
-          <button @click="changeStandard($event)" class="dropdown-item" href="#">평점</button>
-          <button @click="changeStandard($event)" class="dropdown-item" href="#">출시일</button>
-        </div>
-
-        <ul id="multicol-menu" class="nav pull-right">
-            <li class="dropdown">
-                <button class="btn btn-outline-primary" class="dropdown-toggle" data-toggle="dropdown">[[ genres[genre] ]]</button>
-                <div class="dropdown-menu">
-                    <div class="row" style="width: 500px;">
-                        <p v-for="genre in genres" @click="changeGenre($event)" class="col-3">[[ genre ]]</p>
+        <div class="menu-toggle d-flex justify-content-around">
+            <ul id="multicol-menu" class="nav pull-right">
+                <li class="dropdown">
+                    <button class="btn btn-outline-primary" class="dropdown-toggle" data-toggle="dropdown">[[ genres[genre] ]]</button>
+                    <div class="dropdown-menu">
+                        <div class="row" style="width: 500px;">
+                            <p v-for="genre in genres" @click="changeGenre($event)" class="col-3">[[ genre ]]</p>
+                        </div>
                     </div>
-                </div>
-            </li>
-        </ul>
+                </li>
+            </ul>
 
-        
-        <div class="dropdown">
-            <button type="button" class="btn btn-outline-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">[[ standards[standard] ]]</button>
-            <div class="dropdown-menu">
-            <button v-for="standard in standards" @click="changeStandard($event)" class="dropdown-item" href="#">[[ standard ]]</button>
+            
+            <div class="dropdown">
+                <button type="button" class="btn btn-outline-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">[[ standards[standard] ]]</button>
+                <div class="dropdown-menu">
+                <button v-for="standard in standards" @click="changeStandard($event)" class="dropdown-item" href="#">[[ standard ]]</button>
+                </div>
             </div>
         </div>
 
 
-
-        <div class="row">
+        <h1 v-if="!isExist">해당하는 영화가 없습니다. DB 업데이트를 기다려주세용!</h1>
+        <div v-else class="row">
             <div v-for="movie in movies" class="card col-3" style="width: 18rem;" :id="getCardId(movie)">
-                <img :src="getMoviePoster(movie)" class="card-img-top">
+                <img :src="getMoviePoster(movie)" class="card-img-top" style="height: 400px;">
                 <div class="card-body">
                     <h5 class="card-title">[[ movie.title ]]</h5>
                     <p v-text="getMovieOverview(movie)" class="card-text"></p>
-                    <a :href="getReviewUrl(movie)"><button class="btn btn-info">리뷰 보기</button></a>
-                    <a :href="getCreateReviewUrl(movie)"><button class="btn btn-outline-info">리뷰 쓰러 가기</button></a>
-                    <button @click="getGenres(movie)" type="button" class="btn btn-primary float-right" data-toggle="modal" :data-target="makeModal(movie)">더보기</button>
+                    <a :href="getReviewUrl(movie)" class="d-inline-block"><button class="btn btn-info">리뷰 보기</button></a>
+                    <a :href="getCreateReviewUrl(movie)" class="d-inline-block"><button class="btn btn-outline-info">리뷰 쓰기</button></a>
+                    <button @click="getGenres(movie)" type="button" class="btn btn-primary float-right my-3" data-toggle="modal" :data-target="makeModal(movie)">더보기</button>
                 </div>
 
-                <div class="modal fade" :id="getModal(movie)" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
+                <div class="modal fade bd-example-modal-xl" :id="getModal(movie)" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+                    <div class="modal-dialog modal-xl" role="document">
                         <div class="modal-content">
                             <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLongTitle">[[ movie.title ]] ([[movie.original_title ]])</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <h5 class="modal-title" id="exampleModalLabel">[[ movie.title ]] ([[movie.original_title ]])</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
-                            </button>
+                                </button>
                             </div>
-                            <img :src="getMoviePoster(movie)" class="card-img-top" alt="...">
                             <div class="modal-body">
-                                <button class='btn btn-outline-success float-right'>[[ movie.vote_average ]]</button>
-                                <p>개봉일 : [[ movie.release_date ]]</p>
-                                <hr>
-                                [[ movie.like_users ]]
+                                <div class="container-fluid">
+                                    <div class="row">
+                                        <img :src="getMoviePoster(movie)" class="card-img-top col-4" alt="...">
+                                        <div class="col-4">
+                                            <button class='btn btn-outline-success float-right'>[[ movie.vote_average ]]</button>
+                                            <p>개봉일 : [[ movie.release_date ]]</p>
+                                            <hr>
+                                            <button v-for="genre in temp_genres" type="button" class="btn btn-outline-secondary animated infinite swing delay-1s slow mx-3">[[ genre ]]</button>
+                                            <hr>
+                                            <p class="text-left">[[ movie.overview ]]</p>
+                                        </div>
+                                        <div class="col-4">
+                                            <i v-if="checkLike(movie)" @click="changeLike(movie, $event)" class="fas fa-heart" style="color:red;" data-dismiss="modal">좋아요 취소</i>
+                                            <i v-else class="fas fa-heart" @click="changeLike(movie, $event)" style="color:black;">좋아요</i>
 
-                                <i v-if="checkLike(movie)" @click="changeLike(movie, $event)" class="fas fa-heart" style="color:red;" data-dismiss="modal">좋아요 취소</i>
-                                <i v-else class="fas fa-heart" @click="changeLike(movie, $event)" style="color:black;">좋아요</i>
-
-                                <h3>줄거리</h3>
-                                <p>[[ movie.overview ]]</p>
-                                
-                                <button v-for="genre in temp_genres" type="button" class="btn btn-outline-secondary animated infinite swing delay-1s slow">[[ genre ]]</button>
-                                <!-- {% for genre in movie.genres.all %}
-                                    <button type="button" class="btn btn-outline-secondary animated infinite swing delay-1s slow">{{ genre.name }}</button>
-                                {% endfor %} -->
-                                
-                                <h2 class="text-left">리뷰 위치</h2>
-                                <ul class="text-left">
-                                    <li v-if="reviews.length == 0">작성된 리뷰가 없습니다.</li>
-                                    <li v-else v-for="review in reviews">[[ review ]]</li>
-                                </ul>
-
-                                <h2>리뷰 작성용 위치</h2>
-                                <div class="input-group mb-3">
-                                    <input v-model="reviewInput" type="text" class="form-control" placeholder="간단 리뷰 작성하기" aria-label="Recipient's username" aria-describedby="button-addon">
-                                    <div class="input-group-append">
-                                        <button class="btn btn-outline-secondary" type="button" id="button-addon" @click="makeReview(movie)">작성</button>
+                                            <button v-if="checkExclude(movie)" @click="changeExclude(movie, $event)" type="button" class="btn btn-danger exclude-buttons" data-dismiss="modal">실행 취소</button>
+                                            <button v-else type="button" @click="changeExclude(movie, $event)" class="btn btn-danger exclude-buttons" data-dismiss="modal">안 볼거야!</button>
+                                    
+                                            <button v-if="checkLater(movie)" @click="changeLater(movie, $event)" type="button" class="btn btn-info later-buttons" data-dismiss="modal">안 볼래용</button>
+                                            <button v-else type="button" @click="changeLater(movie, $event)" class="btn btn-info later-buttons" data-dismiss="modal">나중에 볼게요//</button>        
+                                            <hr>
+                                            <p> 최근 5개의 리뷰만 표시됩니다. <button class="btn btn-outline-info">전체 리뷰 보기</button></p>
+                                            <ul class="text-left">
+                                                <li v-if="reviews.length == 0">작성된 리뷰가 없습니다.</li>
+                                                <li v-else v-for="review in reviews">[[ review ]]</li>
+                                            </ul>
+                                            <div class="input-group mb-3 row">
+                                                <select class="form-control col-2" id="exampleFormControlSelect1" v-model="reviewScore">
+                                                    <option>0</option>
+                                                    <option>1</option>
+                                                    <option>2</option>
+                                                    <option>3</option>
+                                                    <option>4</option>
+                                                    <option>5</option>
+                                                    <option>6</option>
+                                                    <option>7</option>
+                                                    <option>8</option>
+                                                    <option>9</option>
+                                                    <option>10</option>
+                                                </select>
+                                                <div class="col-10 px-0">
+                                                    <div class="row">
+                                                        <input v-model="reviewInput" type="text" class="form-control col-9" placeholder="간단 리뷰 작성하기" aria-label="Recipient's username" aria-describedby="button-addon">
+                                                        <div class="px-0 input-group-append col-3">
+                                                            <button class="btn btn-outline-secondary" type="button" id="button-addon" @click="makeReview(movie)">작성</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>                              
-                            </div>
-
-                            <div class="modal-footer">
-                    
-                            <button v-if="checkExclude(movie)" @click="changeExclude(movie, $event)" type="button" class="btn btn-danger exclude-buttons" data-dismiss="modal">실행 취소</button>
-                            <button v-else type="button" @click="changeExclude(movie, $event)" class="btn btn-danger exclude-buttons" data-dismiss="modal">안 볼거야!</button>
-                    
-                            <button v-if="checkLater(movie)" @click="changeLater(movie, $event)" type="button" class="btn btn-info later-buttons" data-dismiss="modal">안 볼래용</button>
-                            <button v-else type="button" @click="changeLater(movie, $event)" class="btn btn-info later-buttons" data-dismiss="modal">나중에 볼게요//</button>
-
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            
-                            <!-- 
-                            <p><span id="like-count-{{movie.pk}}">{{ movie.like_users.all|length }}</span>명이 좋아합니다!</p>
- -->
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-
-
-
             </div>
         </div>
 
 
         <div class="btn btn-group">
-            <button @click="moveFirst" class="btn btn-outline-primary">처음으로</button>
+            <button @click="moveFirst" v-if="curPageNumber != 0" class="btn btn-outline-primary">처음으로</button>
             <button @click="movePage" v-if="curPageNumber - 1 > 0" class="btn btn-outline-primary">[[ curPageNumber - 1 ]]</button>
             <button @click="movePage" v-if="curPageNumber > 0" class="btn btn-outline-primary">[[ curPageNumber ]]</button>
-            <button @click="movePage" class="btn btn-outline-primary">[[ curPageNumber + 1 ]]</button>
+            <button @click="movePage" class="btn btn-primary">[[ curPageNumber + 1 ]]</button>
             <button @click="movePage" v-if="curPageNumber < maxPageNumber" class="btn btn-outline-primary">[[ curPageNumber + 2 ]]</button>
             <button @click="movePage" v-if="curPageNumber + 1 < maxPageNumber" class="btn btn-outline-primary">[[ curPageNumber + 3 ]]</button>
-            <button @click="moveLast" class="btn btn-outline-primary">마지막으로</button>
+            <button @click="moveLast" v-if="curPageNumber != maxPageNumber" class="btn btn-outline-primary">마지막으로</button>
         </div>
     </div>
 {% endblock %}
@@ -142,7 +142,7 @@
         el: '#app',
         data: {
             curPageNumber: 0,
-            maxPageNumber: "{{ movie_cnt }}",
+            maxPageNumber: 0,
             movies: {},
             like_movies: [],
             exclude_movies: [],
@@ -154,6 +154,7 @@
             genre: 0,
             reviews: [],
             reviewInput: null,
+            reviewScore: 0,
         },
         methods: {
             getMovies(pageNumber, key, genre) {
@@ -164,6 +165,7 @@
                     this.like_movies = res.data.like_movies
                     this.exclude_movies = res.data.exclude_movies
                     this.later_movies = res.data.later_movies
+                    this.maxPageNumber = res.data.max_page
                 })
                 .catch(err => {
                     console.log(err)
@@ -232,13 +234,23 @@
                     .catch(err => console.log(err))
             },
             makeReview(movie) {
-                console.log(1)
                 axios.get(`/movies/make_review/${movie.id}/`, {
                     params: {
-                        content: this.reviewInput
+                        content: this.reviewInput,
+                        score: this.reviewScore
                     }})
                     .then(res => {
-                        this.reviews = [...[res.data.review], ...this.reviews]
+                        console.log(res)
+                        if (res.data.result == 'success') {
+                            this.reviews = [...[res.data.review], ...this.reviews]
+                        } else if (res.data.result == 'false') {
+                            alert("리뷰는 50자 이하로 입력해주세요!")
+                        } else {
+                            let answer = confirm("기존에 작성한 리뷰로 이동할까요?")
+                            if (answer) {
+                                window.location.href = `/movies/review/${res.data.exist_review}`
+                            }
+                        }
                         this.reviewInput = ''
                     })
                     .catch(err => console.log(err))
@@ -275,10 +287,8 @@
                         let exclude = res.data.exclude
                         if (exclude) {
                             event.target.innerText = '실행 취소'
-                            document.querySelector(`#card-${movie.id}`).innerHTML = '<p class="align-middle my-auto text-center">동영상 숨김</p>'
                         } else {
                             event.target.innerText = '안 볼거야!'
-                            document.querySelector(`#card-${movie.id}`).innerHTML = '<p class="align-middle my-auto text-center">새로고침 시 제대로 출력됩니다!</p>'
                         }
                         })
                     .catch(error=> {console.log(error)})
@@ -298,6 +308,15 @@
             scrollToTop () {
             scroll(0, 0)
             },
+        },
+        computed: {
+            isExist() {
+                if (this.maxPageNumber == -1) {
+                    return false
+                } else {
+                    return true
+                }
+            }
         },
         created() {
             this.getMovies(0, 0, 0)
