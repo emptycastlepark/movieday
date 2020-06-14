@@ -13,12 +13,12 @@
   <h5>작성자: {{article.author }}</h5>
   <p>작성일자: {{ article.created_at }}</p>
   <p>수정일자: {{ article.updated_at }}</p>
-  <span id="like-count-{{ article.pk }}">{{ article.like_users.all|length }}</span>명이 이 글을 좋아합니다.<br>
+  추천 <span id="like-count-{{ article.pk }}">{{ article.like_users.all|length }}</span><br>
   {% if request.user != article.author %}
     {% if user in article.like_users.all %}
-      <i data-id="{{ article.pk }}" class="fas fa-heart fa-lg like-button" style="color:crimson; cursor: pointer;"></i>
+      <i data-id="{{ article.pk }}" class="far fa-thumbs-up fa-lg like-button" style="color:blue; cursor: pointer;"></i>
     {% else %}
-      <i data-id="{{ article.pk }}" class="fas fa-heart fa-lg like-button" style="color:black; cursor: pointer;"></i>
+      <i data-id="{{ article.pk }}" class="far fa-thumbs-up fa-lg like-button" style="color:black; cursor: pointer;"></i>
     {% endif %}
   {% else %}
     <form action="{% url 'community:article_delete' article.pk %}" method='POST'>
@@ -52,7 +52,7 @@
         axios.get(`/community/${articleId}/article_like/`)
           .then(response => {
             if (response.data.liked) {
-              event.target.style.color = 'crimson'
+              event.target.style.color = 'blue'
             } else {
               event.target.style.color = 'black'
             }

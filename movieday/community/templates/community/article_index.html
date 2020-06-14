@@ -9,23 +9,42 @@
 
 {% block content %}
 
-    <h1>Community Index</h1>
+    <h1>자유게시판</h1>
     <br>
     <a href="{% url 'community:article_create' %}">글 작성</a>
+    <form class="form-inline my-2 my-lg-0" method="GET" action="{% url 'community:article_search' %}">
+        <input class="form-control mr-sm-2" type="search" placeholder="" aria-label="Search" name="kw" value="{{ kw }}">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">검색</button>
+    </form>
+    <div class="dropdown">
+        <button class="border border-dark bg-light text-dark dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          정렬
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <a class="dropdown-item" href="{% url 'community:article_index' %}">최신순</a>
+            <a class="dropdown-item" href="{% url 'community:article_index_recommend' %}">추천순</a>
+          <!-- <option class="dropdown-item" value="recent" {% if so == 'recent' %}selected{% endif %}>최신순</option>
+          <option class="dropdown-item" value="recommend" {% if so == 'recommend' %}selected{% endif %}>추천순</option> -->
+        </div>
+      </div>
     <table class="table">
         <thead>
-        <tr>
-            <th scope="col">#</th>
-            <th scope="col">Title</th>
-            <th scope="col">작성자</th>
+        <tr class="bg-dark text-white">
+            <th>번호</th>
+            <th>제목</th>
+            <th>글쓴이</th>
+            <th>등록일</th>
+            <th>추천</th>
         </tr>
         </thead>
         {% for article in page_obj %}
             <tbody>
             <tr>
                 <td>{{ article.pk }}</td>
-                <th scope="row"><a href ="{% url 'community:article_detail' article.pk %}">{{ article.title }}</a></th>
+                <td><a class="text-dark" href ="{% url 'community:article_detail' article.pk %}">{{ article.title }}</a></td>
                 <td>{{ article.author }}</td>
+                <td>{{ article.created_at|date:"m-d" }}</td>
+                <td>{{ article.like_users.all|length }}</td>
             </tr>
             </tbody>
         {% endfor %}

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load bootstrap_pagination %}
+{% load static %}
+
+{% block css %}
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'community/article_create.css' %}">
+{% endblock %}
+
+{% block content %}
+  <h1>'{{kw}}' 검색 결과</h1>
+  {% if not page_obj %}
+  <h4>검색 결과가 없습니다.</h4>
+  {% else %}
+  <h4>총 {{ search_result.all|length }}개의 글이 검색되었습니다.</h4>
+  <table class="table">
+    <thead>
+    <tr class="bg-dark text-white">
+        <th>번호</th>
+        <th>제목</th>
+        <th>글쓴이</th>
+        <th>등록일</th>
+        <th>추천</th>
+    </tr>
+    </thead>
+    {% for article in page_obj %}
+        <tbody>
+        <tr>
+            <td>{{ article.pk }}</td>
+            <td><a class="text-dark" href ="{% url 'community:article_detail' article.pk %}">{{ article.title }}</a></td>
+            <td>{{ article.author }}</td>
+            <td>{{ article.created_at|date:"m-d" }}</td>
+            <td>{{ article.like_users.all|length }}</td>
+        </tr>
+        </tbody>
+    {% endfor %}
+  </table>
+  {% endif %}
+
+  <div class="d-flex justify-content-center">{% bootstrap_paginate page_obj range=10 show_prev_next="false" show_first_last="true"%}</div>
+
+{% endblock %}
