@@ -154,7 +154,10 @@
             genre: 0,
             reviews: [],
             reviewInput: null,
+<<<<<<< HEAD
             reviewScore: 0,
+=======
+>>>>>>> b94a1fecab8b157412b886029cad532ce0040f3a
         },
         methods: {
             getMovies(pageNumber, key, genre) {
@@ -234,6 +237,7 @@
                     .catch(err => console.log(err))
             },
             makeReview(movie) {
+<<<<<<< HEAD
                 axios.get(`/movies/make_review/${movie.id}/`, {
                     params: {
                         content: this.reviewInput,
@@ -251,6 +255,15 @@
                                 window.location.href = `/movies/review/${res.data.exist_review}`
                             }
                         }
+=======
+                console.log(1)
+                axios.get(`/movies/make_review/${movie.id}/`, {
+                    params: {
+                        content: this.reviewInput
+                    }})
+                    .then(res => {
+                        this.reviews = [...[res.data.review], ...this.reviews]
+>>>>>>> b94a1fecab8b157412b886029cad532ce0040f3a
                         this.reviewInput = ''
                     })
                     .catch(err => console.log(err))

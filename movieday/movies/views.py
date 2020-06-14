@@ -210,6 +210,7 @@ def get_reviews(request, movie_id):
 def make_review(request, movie_id):
     movie = get_object_or_404(Movie, id=movie_id)
     movie_reviews = movie.moviereview_set.all()
+
     form = MovieReviewForm()
 
     review = form.save(commit=False)
