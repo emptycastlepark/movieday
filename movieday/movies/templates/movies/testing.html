@@ -16,7 +16,7 @@
                 <button @click="movenext" v-if="!isLastDate" class="btn btn-outline-primary col-1">></button>
             </div>
             <ul>
-                <li v-for="movie in movie_rank">[[ movie.movieNm ]]</li>
+                <li v-for="movie in movie_rank">[[ movie.movieNm ]] // [[movie.movieCd]]</li>
             </ul>
         </div>
         <div v-else>

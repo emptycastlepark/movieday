@@ -3,13 +3,13 @@ from django.template.defaulttags import register
 from django.http import JsonResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.decorators import login_required
+from django.db.models import Avg
 
 from movieday.settings import SECRET_KEY_WEATHER_API_KEY, SECRET_KEY_MOVIE_API_KEY, SECRET_KEY_KOBIS_API_KEY
 from .models import Movie, Genre, MovieReview
 from .forms import MovieReviewForm, MovieReviewWithoutMovieForm
 
-import random
-import json
+import random, json
 
 def index(request):
     movie_count = Movie.objects.all().count()
@@ -20,6 +20,7 @@ def index(request):
     }
     return render(request, 'movies/index.html', context)
 
+@login_required
 def movie_list(request):
     movie_cnt = Movie.objects.exclude(id__in=request.user.exclude_movies.all()).count() // 16
     context = {
@@ -27,7 +28,7 @@ def movie_list(request):
     }
     return render(request, 'movies/movies_list.html', context)
 
-
+@login_required
 def movie_recommend(request):
     user = request.user
 
@@ -87,7 +88,6 @@ def movie_upcoming(request):
     return render(request, 'movies/movies_upcoming.html', context)
 
 
-
 def review_list(request):
     reviews = MovieReview.objects.order_by('-id')
 
@@ -96,9 +96,22 @@ def review_list(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
+    top_movie_totals = MovieReview.objects.values('movie').annotate(total=Avg('score')).order_by('-total')[:3]
+
+    top_movie_ids = []
+    top_movie_avg = []
+    for top_movie_total in top_movie_totals:
+        top_movie_ids.append(top_movie_total['movie'])
+        top_movie_avg.append(top_movie_total['total'])
+
+    top_movie_obj = Movie.objects.filter(id__in=top_movie_ids)
+
+    top_movies = list(zip(top_movie_obj, top_movie_avg))
+
     context = {
         'reviews': reviews,
         'page_obj': page_obj,
+        'top_movies': top_movies,
     }
     return render(request, 'movies/review_list.html', context)
 
@@ -117,8 +130,15 @@ def review_list_movie(request, movie_id):
     }
     return render(request, 'movies/review_list_movie.html', context)
 
+def review_detail(request, review_id):
+    review = get_object_or_404(MovieReview, id=review_id)
+    context = {
+        'review': review,
+    }
+    return render(request, 'movies/review_detail.html', context)
+
 @login_required
-def review_create(request, movie_id):
+def review_create(request, movie_id):    
     movie = get_object_or_404(Movie, id=movie_id)
     if request.method == 'POST':
         form = MovieReviewForm(request.POST)
@@ -158,7 +178,7 @@ def get_movies(request, pageNum, key, genre_key):
     like_movies = list(request.user.like_movies.values_list('id', flat=True))
     exclude_movies = list(request.user.exclude_movies.values_list('id', flat=True))
     later_movies = list(request.user.later_movies.values_list('id', flat=True))
-    genre_name = [None, 'Adventure', 'Fantasy', 'Animation', 'Drama', 'Horror', 'Action', 'Comedy', 'Western', 'Thriller', 'Crime', 'Docu', 'SF',
+    genre_name = [None, 'Adventure', 'Fantasy', 'Animation', 'Drama', 'Horror', 'Action', 'Comedy', 'Western', 'Thriller', 'Crime', 'Documentary', 'Science Fiction',
                 'Mystery', 'Music', 'Romance', 'Family', 'War', 'History', 'TV Movie']
 
     if genre_key == 0:
@@ -171,7 +191,11 @@ def get_movies(request, pageNum, key, genre_key):
     elif key == 1:
         movies = list(genre_movies.order_by('-release_date').values())[pageNum*16:(pageNum+1)*16]
 
-    return JsonResponse({'movies': movies, 'like_movies': like_movies, 'exclude_movies': exclude_movies, 'later_movies': later_movies}, status = 200)
+    max_page = len(genre_movies) // 16
+    if len(genre_movies) % 16 == 0:
+        max_page -= 1
+
+    return JsonResponse({'movies': movies, 'like_movies': like_movies, 'exclude_movies': exclude_movies, 'later_movies': later_movies, 'max_page': max_page}, status = 200)
 
 
 def get_genres(request, movie_id):
@@ -185,18 +209,29 @@ def get_reviews(request, movie_id):
 
 def make_review(request, movie_id):
     movie = get_object_or_404(Movie, id=movie_id)
+    movie_reviews = movie.moviereview_set.all()
 
     form = MovieReviewForm()
 
     review = form.save(commit=False)
     review.content = request.GET.get('content')
+    review.score = request.GET.get('score')
     review.author = request.user
     review.movie = movie
-    review.save()
+
+    exist_review = None
+    if movie_reviews.filter(id__in=request.user.moviereview_set.all()).exists():
+        result = "exist"
+        exist_review = movie_reviews.get(author=request.user).id
+    elif len(request.GET.get('content')) <= 50:
+        review.save()
+        result = "success"
+    else:
+        result = "false"
 
     review = review.serializable_value('content')
 
-    return JsonResponse({'review': review}, status = 200)
+    return JsonResponse({'review': review, 'result': result, 'exist_review': exist_review}, status = 200)
 
 
 def get_movie_recommend(request, weather, temp):
