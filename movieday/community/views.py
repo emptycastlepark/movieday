@@ -3,11 +3,31 @@ from django.views.decorators.http import require_POST
 from .models import Article, Comment
 from .forms import ArticleForm, CommentForm
 from django.http import JsonResponse
+from django.db.models import Q, Count
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 # Create your views here.
 def article_index(request):
-    articles = Article.objects.all()
+    articles = Article.objects.all().order_by('-pk')
+    # so = request.GET.get('so', 'recent')
+
+    # if so == 'recommend':
+    #     articles = Article.objects.annotate(num_like_users=Count('like_users')).order_by('-num_like_users', '-pk')
+    # else:
+    #     articles = Article.objects.all().order_by('-pk')
+
+    paginator = Paginator(articles, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'articles': articles,
+        'page_obj': page_obj
+    }
+    return render(request, 'community/article_index.html', context)
+
+def article_index_recommend(request):
+    articles = Article.objects.annotate(num_like_users=Count('like_users')).order_by('-num_like_users', '-pk')
 
     paginator = Paginator(articles, 10)
     page_number = request.GET.get('page')
@@ -94,6 +114,29 @@ def article_like(request, article_pk):
         'like_count': article.like_users.count(),
     })
 
+
+def article_search(request):
+    articles = Article.objects.order_by('-pk')
+    kw = request.GET.get('kw', '')
+    if kw:
+        search_result = articles.filter(
+            Q(title__icontains=kw)|
+            Q(content__icontains=kw)|
+            Q(author__username__icontains=kw)
+        ).distinct()
+
+        paginator = Paginator(search_result, 10)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+
+        context = {
+            'search_result': search_result,
+            'kw': kw,
+            'page_obj': page_obj
+        }
+        return render(request, 'community/article_search.html', context)
+    else:
+        return redirect('community:article_index')
 
 def comment_create(request, article_pk):
     if request.user.is_authenticated:
