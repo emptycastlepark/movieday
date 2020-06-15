@@ -5,6 +5,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 
 # Create your views here.
 
@@ -65,6 +66,7 @@ def update(request, user_id):
             form = CustomUserChangeForm(instance=user)
         context = {
             'form': form,
+            'user': user,
         }
         return render(request, 'accounts/userform.html', context)
     else:
@@ -78,3 +80,15 @@ def detail(request, user_id):
         'user': user,
     }
     return render(request, 'accounts/detail.html', context)
+
+def get_movies(request, user_id, key):
+    User = get_user_model()
+    user = get_object_or_404(User, id=user_id)
+    if key == 0:
+        movies = list(user.like_movies.all().values())
+    elif key == 1:
+        movies = list(user.later_movies.all().values())
+    elif key == 2:
+        movies = list(user.exclude_movies.all().values())
+
+    return JsonResponse({'movies': movies}, status = 200)

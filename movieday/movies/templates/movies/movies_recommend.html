@@ -156,13 +156,13 @@
               </div>
             </div>
                   
-            <div class="carousel-item">
+            <div v-if="checkEmpty(second_movies)" class="carousel-item">
               <div class="row">
                 <img v-for="movie in second_movies" :src="getPosterUrl(movie)" data-toggle="modal" :data-target="makeModalId(movie)" class="d-block w-100 col-2" alt="...">
               </div>
             </div>
                   
-            <div class="carousel-item">
+            <div v-if="checkEmpty(last_movies)" class="carousel-item">
               <div class="row">
                 <img v-for="movie in last_movies" :src="getPosterUrl(movie)" data-toggle="modal" :data-target="makeModalId(movie)" class="d-block w-100 col-2" alt="...">
               </div>
@@ -197,7 +197,7 @@
           </div>
         </div>
       </div>
-      <div v-for="movie in second_movies" class="modal fade" :id="getModalId(movie)" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+      <div v-if="checkEmpty(second_movies)" v-for="movie in second_movies" class="modal fade" :id="getModalId(movie)" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
         <div class="modal-dialog" role="document">
           <div class="modal-content">
             <div class="modal-header">
@@ -218,7 +218,7 @@
           </div>
         </div>
       </div>
-      <div v-for="movie in last_movies" class="modal fade" :id="getModalId(movie)" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+      <div v-if="checkEmpty(last_movies)" v-for="movie in last_movies" class="modal fade" :id="getModalId(movie)" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
         <div class="modal-dialog" role="document">
           <div class="modal-content">
             <div class="modal-header">
@@ -346,6 +346,13 @@
       },
       getModalId(movie) {
         return `modal-${movie.id}`
+      },
+      checkEmpty(movieArray) {
+        if (movieArray.length > 0) {
+          return true
+        } else {
+          return false
+        }
       }
     },
     created() {
