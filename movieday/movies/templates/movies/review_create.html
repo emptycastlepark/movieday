@@ -10,13 +10,30 @@
 
 {% block content %}
     {% if request.resolver_match.url_name == 'review_create' %}
-        <h1>{{ movie }} 리뷰 작성 중</h1>
+        <h1>'{{ movie }}' 리뷰 작성 중</h1>
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <img src="https://image.tmdb.org/t/p/original/{{ movie.poster_path }}" alt="" class="img-thumbnail">
+                </div>
+                <div class="col">
+                    <h3>{{ movie.title }}</h3>
+                    <p>{{ movie.overview }}</p>
+                    <hr>
+                    <form action="" method="POST">
+                        {% csrf_token %}
+                        {% bootstrap_form form %}
+                        <button class="btn btn-primary">작성 완료</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     {% else %}
         <h1>리뷰 작성</h1>
+        <form action="" method="POST">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            <button class="btn btn-primary">작성 완료</button>
+        </form>
     {% endif %}
-    <form action="" method="POST">
-        {% csrf_token %}
-        {% bootstrap_form form %}
-        <button class="btn btn-primary">작성 완료</button>
-    </form>
 {% endblock %}
