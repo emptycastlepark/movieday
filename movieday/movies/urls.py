@@ -13,6 +13,7 @@ urlpatterns = [
     path('review_create_withoutmovie/', views.review_create_withoutmovie, name='review_create_withoutmovie'),
     path('review_create/<int:movie_id>/', views.review_create, name='review_create'),
     path('review_update/<int:review_id>/', views.review_update, name="review_update"),
+    path('review_delete/<int:review_id>/', views.review_delete, name="review_delete"),
 
     path('movie_like/<int:movie_id>/', views.movie_like, name='movie_like'),
     path('movie_exclude/<int:movie_id>/', views.movie_exclude, name='movie_exclude'),

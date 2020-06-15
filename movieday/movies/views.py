@@ -185,22 +185,36 @@ def review_create_withoutmovie(request):
 
 def review_update(request, review_id):
     if request.user.is_authenticated:
-        review = get_object_or_404(MovieReview, id=MovieReview_id)
+        review = get_object_or_404(MovieReview, id=review_id)
         if request.user == review.author:
             if request.method == 'POST':
                 form = MovieReviewForm(request.POST, instance=review)
                 if form.is_valid():
                     review = form.save()
-                    return redirect('movie:review_detail', review.id)
+                    return redirect('movies:review_detail', review.id)
             else:
                 form = MovieReviewForm(instance=review)
             context = {
                 'form': form,
                 'review': review,
+                'movie': review.movie,
             }
-            return render(request, 'movie/review_update.html', context)
+            return render(request, 'movies/review_update.html', context)
         else:
-            return redirect('movie:review_detail', review.id)
+            return redirect('movies:review_detail', review.id)
+    else:
+        return redirect('accounts:login')
+
+
+def review_delete(request, review_id):
+    if request.user.is_authenticated:
+        review = get_object_or_404(MovieReview, id=review_id)
+        if request.user == review.author and request.method=='POST':
+            movie_id = review.movie.id
+            review.delete()
+            return redirect('movies:review_list_movie', movie_id)
+        else:
+            return redirect('movies:review_detail', review.id)
     else:
         return redirect('accounts:login')
 
