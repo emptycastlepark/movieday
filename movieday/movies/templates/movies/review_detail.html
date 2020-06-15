@@ -8,10 +8,24 @@
 
 
 {% block content %}
-    <div id="app">
-        <h1>{{ review.movie.title }}</h1>
-        <p>작성자 : {{ review.author.nickname }}</p>
-        <p>{{ review.content }}</p>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <img src="https://image.tmdb.org/t/p/original/{{ review.movie.poster_path }}" alt="" class="img-thumbnail">
+            </div>
+            <div id="app" class="col">
+                <h1>{{ review.movie.title }}</h1>
+                <p>{{ review.movie.overview }}</p>
+                <hr>
+                <p>한줄평: {{ review.content }}</p>
+                <p>평점: {{ review.score }}</p>
+                <hr>
+                <p>작성자: {{ review.author.nickname }}</p>
+                <p>작성일자: {{ review.created_at }}</p>
+                <p>수정일자: {{ review.updated_at }}</p>
+                <a href="">리뷰 수정</a>
+            </div>
+        </div>
     </div>
 {% endblock %}
 

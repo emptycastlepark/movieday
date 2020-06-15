@@ -99,15 +99,14 @@ def review_list(request):
 
     top_movie_totals = MovieReview.objects.values('movie').annotate(total=Avg('score')).order_by('-total')[:3]
 
-    top_movie_ids = []
-    top_movie_avg = []
-    for top_movie_total in top_movie_totals:
-        top_movie_ids.append(top_movie_total['movie'])
-        top_movie_avg.append(top_movie_total['total'])
+    first_movies = MovieReview.objects.values('movie').annotate(total=Avg('score')).order_by('-total')[0]
+    second_movies = MovieReview.objects.values('movie').annotate(total=Avg('score')).order_by('-total')[1]
+    last_movies = MovieReview.objects.values('movie').annotate(total=Avg('score')).order_by('-total')[2]
+    first_movie = Movie.objects.get(id=first_movies['movie'])
+    second_movie = Movie.objects.get(id=second_movies['movie'])
+    last_movie = Movie.objects.get(id=last_movies['movie'])
 
-    top_movie_obj = Movie.objects.filter(id__in=top_movie_ids)
-
-    top_movies = list(zip(top_movie_obj, top_movie_avg))
+    top_movies = [[first_movie, first_movies['total']], [second_movie, second_movies['total']], [last_movie, last_movies['total']]]
 
     context = {
         'reviews': reviews,
@@ -182,6 +181,28 @@ def review_create_withoutmovie(request):
         'form': form,
     }
     return render(request, 'movies/review_create.html', context)
+
+
+def review_update(request, review_id):
+    if request.user.is_authenticated:
+        review = get_object_or_404(MovieReview, id=MovieReview_id)
+        if request.user == review.author:
+            if request.method == 'POST':
+                form = MovieReviewForm(request.POST, instance=review)
+                if form.is_valid():
+                    review = form.save()
+                    return redirect('movie:review_detail', review.id)
+            else:
+                form = MovieReviewForm(instance=review)
+            context = {
+                'form': form,
+                'review': review,
+            }
+            return render(request, 'movie/review_update.html', context)
+        else:
+            return redirect('movie:review_detail', review.id)
+    else:
+        return redirect('accounts:login')
 
 
 def get_movies(request, pageNum, key, genre_key):

@@ -11,22 +11,22 @@
 
     <h1>자유게시판</h1>
     <br>
-    <a href="{% url 'community:article_create' %}">글 작성</a>
-    <form class="form-inline my-2 my-lg-0" method="GET" action="{% url 'community:article_search' %}">
-        <input class="form-control mr-sm-2" type="search" placeholder="" aria-label="Search" name="kw" value="{{ kw }}">
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">검색</button>
-    </form>
-    <div class="dropdown">
-        <button class="border border-dark bg-light text-dark dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          정렬
-        </button>
-        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            <a class="dropdown-item" href="{% url 'community:article_index' %}">최신순</a>
-            <a class="dropdown-item" href="{% url 'community:article_index_recommend' %}">추천순</a>
-          <!-- <option class="dropdown-item" value="recent" {% if so == 'recent' %}selected{% endif %}>최신순</option>
-          <option class="dropdown-item" value="recommend" {% if so == 'recommend' %}selected{% endif %}>추천순</option> -->
+    <div class="d-flex bd-highlight mb-1">
+        <a class="mr-auto p-2 bd-highlight" href="{% url 'community:article_create' %}">글 작성</a>
+        <div class="dropdown p-2 bd-highlight">
+            <button class="border border-dark bg-light text-dark dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            정렬
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item" href="{% url 'community:article_index' %}">최신순</a>
+                <a class="dropdown-item" href="{% url 'community:article_index_recommend' %}">추천순</a>
+            </div>
         </div>
-      </div>
+        <form class="form-inline my-2 my-lg-0 bd-highlight" method="GET" action="{% url 'community:article_search' %}">
+            <input class="form-control mr-sm-2" type="search" placeholder="" aria-label="Search" name="kw" value="{{ kw }}">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">검색</button>
+        </form>
+    </div>
     <table class="table">
         <thead>
         <tr class="bg-dark text-white">

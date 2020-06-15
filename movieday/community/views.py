@@ -9,12 +9,6 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 # Create your views here.
 def article_index(request):
     articles = Article.objects.all().order_by('-pk')
-    # so = request.GET.get('so', 'recent')
-
-    # if so == 'recommend':
-    #     articles = Article.objects.annotate(num_like_users=Count('like_users')).order_by('-num_like_users', '-pk')
-    # else:
-    #     articles = Article.objects.all().order_by('-pk')
 
     paginator = Paginator(articles, 10)
     page_number = request.GET.get('page')
@@ -25,6 +19,7 @@ def article_index(request):
         'page_obj': page_obj
     }
     return render(request, 'community/article_index.html', context)
+
 
 def article_index_recommend(request):
     articles = Article.objects.annotate(num_like_users=Count('like_users')).order_by('-num_like_users', '-pk')
@@ -137,6 +132,7 @@ def article_search(request):
         return render(request, 'community/article_search.html', context)
     else:
         return redirect('community:article_index')
+
 
 def comment_create(request, article_pk):
     if request.user.is_authenticated:
