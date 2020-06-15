@@ -2,11 +2,142 @@
 {% load static %}
 
 {% block content %}
-    <h1>{{ user.username }} : {{ user.nickname }}</h1>
-    {% if request.user == user %}
-        <a class="nav-link" href="{% url 'accounts:update' user.id %}">개인정보 수정하기</a>
-    {% endif %}
-    <h2>선호 장르</h2>
-    <p>{{ user.like_genres.all }}</p>
-    <img src="{{ user.profile_image.url }}">
+    <div id="app">
+        <div class="row">
+            <div v-if="isHome" class="col-10">
+                <div class="row">
+                    <img class="col-4" src="{{ user.profile_image.url }}">
+                    <div class="col-8">
+                        <h1>{{ user.username }}({{ user.nickname }})님</h2>
+                        {% if request.user == user %}
+                            <a class="nav-link text-black" href="{% url 'accounts:update' user.id %}">개인정보 수정하기</a>
+                        {% endif %}
+                        <h2>선호 장르</h2>
+                        {% for genre in user.like_genres.all %}
+                            <button class="btn btn-outline-primary m-2">{{ genre }}</button>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div v-else class="col-10">
+                <div class="row">
+                    <div v-for="movie in movies" class="card col-3" style="width: 18rem;">
+                        <img :src="getMoviePoster(movie)" class="card-img-top" alt="...">
+                        <div class="card-body">
+                            <h5 class="card-title">[[ movie.title ]]</h5>
+                            <button @click="changeState(movie, $event)" class="btn btn-outline-danger">[[ nowState ]]</button>
+                            <button class="btn btn-outline-primary" data-toggle="modal" :data-target="makeModal(movie)">더 보기</button>
+                        </div>
+                        
+                        <div class="modal fade" :id="getModal(movie)" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">[[ movie.title ]]</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <img :src="getMoviePosterBack(movie)" class="card-img-top" alt="...">
+                                    <p>[[ movie.overview ]]</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-2">
+                <button @click="goHome" class="btn btn-outline-info my-3">홈으로</button>
+                <button @click="getMovies" class="btn btn-outline-info my-3">좋아요한 영화</button>
+                <button @click="getMovies" class="btn btn-outline-info my-3">나중에 볼 영화</button>
+                <button @click="getMovies" class="btn btn-outline-info my-3">제외한 영화</button>
+            </div>
+        </div>
+
+        <div class="row">
+        </div>
+    </div>
+    
+{% endblock %}
+
+
+{% block vue %}
+
+    <script>
+        const movieKey = ['좋아요한 영화', '나중에 볼 영화', '제외한 영화']
+        const movieKeyDict = {'좋아요한 영화': '좋아요 취소', '나중에 볼 영화': '나중에 보기 취소', '제외한 영화': '다시 보기'}
+        const app = new Vue({
+        delimiters: ['[[', ']]'],
+        el: '#app',
+        data: {
+            userId: "{{ user.id }}",
+            movies: [],
+            movieCount: 0,
+            isHome: true,
+            nowState: null
+        },
+        methods: {
+            getMovies(event) {
+                axios.get(`/accounts/get_movies/${this.userId}/${movieKey.indexOf(event.target.innerText)}`)
+                    .then(res => {
+                        this.movies = res.data.movies
+                        this.movieCount = res.data.movies.length
+                        this.isHome = false
+                        this.nowState = movieKeyDict[event.target.innerText]
+                    })
+                    .catch(err => console.log(err))
+            },
+            goHome() {
+                this.isHome = true
+            },
+            getMoviePoster(movie) {
+                return `https://image.tmdb.org/t/p/original/${movie.poster_path}`
+            },
+            getMoviePosterBack(movie) {
+                return `https://image.tmdb.org/t/p/original/${movie.backdrop_path}`
+            },
+            makeModal(movie) {
+                return `#modal-${movie.id}`
+            },
+            getModal(movie) {
+                return `modal-${movie.id}`
+            },
+            changeState(movie, event) {
+                if (event.target.innerText == "좋아요 취소") {
+                    axios.get(`/movies/movie_like/${movie.id}`)
+                        .then(() => {
+                            this.removeMovie(movie)
+                        })
+                        .catch(err => console.log(err))
+                } else if (event.target.innerText == "나중에 보기 취소") {
+                    axios.get(`/movies/movie_later/${movie.id}`)
+                        .then(() => {
+                            this.removeMovie(movie)
+                        })
+                        .catch(err => console.log(err))
+                } else {
+                    axios.get(`/movies/movie_exclude/${movie.id}`)
+                        .then(() => {
+                            this.removeMovie(movie)
+                        })
+                        .catch(err => console.log(err))
+                }
+            },
+            removeMovie(movie) {
+                let idx = this.movies.indexOf(movie)
+                this.movies.splice(idx, 1)
+            },
+        },
+        computed: {
+        },
+        created() {
+        }
+        })
+    </script>
+
 {% endblock %}

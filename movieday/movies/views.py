@@ -99,15 +99,14 @@ def review_list(request):
 
     top_movie_totals = MovieReview.objects.values('movie').annotate(total=Avg('score')).order_by('-total')[:3]
 
-    top_movie_ids = []
-    top_movie_avg = []
-    for top_movie_total in top_movie_totals:
-        top_movie_ids.append(top_movie_total['movie'])
-        top_movie_avg.append(top_movie_total['total'])
+    first_movies = MovieReview.objects.values('movie').annotate(total=Avg('score')).order_by('-total')[0]
+    second_movies = MovieReview.objects.values('movie').annotate(total=Avg('score')).order_by('-total')[1]
+    last_movies = MovieReview.objects.values('movie').annotate(total=Avg('score')).order_by('-total')[2]
+    first_movie = Movie.objects.get(id=first_movies['movie'])
+    second_movie = Movie.objects.get(id=second_movies['movie'])
+    last_movie = Movie.objects.get(id=last_movies['movie'])
 
-    top_movie_obj = Movie.objects.filter(id__in=top_movie_ids)
-
-    top_movies = list(zip(top_movie_obj, top_movie_avg))
+    top_movies = [[first_movie, first_movies['total']], [second_movie, second_movies['total']], [last_movie, last_movies['total']]]
 
     context = {
         'reviews': reviews,

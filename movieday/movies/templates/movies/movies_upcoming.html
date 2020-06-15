@@ -15,13 +15,19 @@
         <div v-if="isList">
             <button @click="changeComponent" class="btn btn-primary">월 별로 보기</button>
             <div class="row">
-                <div v-for="upcomingMovie in upcomingMovies" class="card col-3" style="width: 18rem;">
+                <div v-for="upcomingMovie in getCurMovies" class="card col-3" style="width: 18rem;">
                     <img :src="getPosterUrl(upcomingMovie)" class="card-img-top">
                     <div class="card-body">
                         <h5 class="card-title">[[ upcomingMovie.title ]]</h5>
                         <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
                         <button type="button" class="btn btn-primary float-right" data-toggle="modal" :data-target="makeModalId(upcomingMovie)">더보기</button>
                     </div>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <div class="btn-group" role="group" aria-label="Basic example">
+                    <button @click="changePage" v-for="number in maxPage" type="button" class="btn btn-outline-secondary">[[ number ]]</button>
                 </div>
             </div>
         </div>
@@ -94,6 +100,8 @@
         lastYear: 0,
         lastMonth: 0,
         upcomingMonth: [],
+        maxPage: 0,
+        curPage: 1,
       },
       methods: {
         changeComponent() {
@@ -105,7 +113,6 @@
                     this.lastMonth = temp_date[1]
                 }
             }
-            console.log(this.changeMonth(this.year, this.month))
             this.year = this.changeMonth(this.year, this.month)[0]
             this.month = this.changeMonth(this.year, this.month)[1]
             this.upcomingMonth = this.changeMonth(this.year, this.month)[2]
@@ -166,6 +173,7 @@
             axios.get(movieUrlAll)
                 .then(res => {
                     let totalPage = res.data.total_pages
+                    this.maxPage = totalPage
                     this.upcomingMovies = [...this.upcomingMovies, ...res.data.results]
                     for (let page=2; page<=totalPage; page++) {
                         let movieUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${this.MOVIE_API_KEY}&language=ko-KR&region=KR&page=${page}&primary_release_date.gte=${this.year}-${formatedmonth}-${formateddate}`
@@ -176,6 +184,10 @@
                     }
                 })
                 .catch(err => console.log(err))
+        },
+        changePage(event) {
+            this.curPage = parseInt(event.target.innerText)
+            this.scrollToTop()
         },
         getPosterUrl(movie) {
             if (movie.poster_path == null) {
@@ -199,7 +211,10 @@
         },
         getModalId(movie) {
             return `modal-${movie.id}`
-        }
+        },
+        scrollToTop () {
+        scroll(0, 0)
+        },
       },
       computed: {
         countMovies() {
@@ -210,7 +225,10 @@
         },
         isLastMonth() {
             return (this.month+1==this.lastMonth) && (this.year==this.lastYear)
-        }
+        },
+        getCurMovies() {
+            return this.upcomingMovies.slice((this.curPage-1)*20, this.curPage*20)
+        },
       },
       created() {
       },
