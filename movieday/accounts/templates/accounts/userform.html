@@ -4,18 +4,28 @@
 
 {% block css %}
     <style>
+        body {
+            background-color: rgb(0, 0, 0);
+        }
         .form-check {
             display: inline-block;
             margin: 5px 5px;
+        }
+        label {
+            color: white;
+        }
+        #id_profile_image {
+            color:white;
         }
     </style>
 {% endblock %}
 
 {% block content %}
+<div class="w-50 mx-auto">
     {% if request.resolver_match.url_name == 'signup' %}
-        <h2>신규 회원 가입</h2>
+        <h2 class="text-white font-weight-bold">신규 회원 가입</h2>
     {% else %}
-        <h2>회원 정보 수정</h2>
+        <h2 class="text-white font-weight-bold">회원 정보 수정</h2>
     {% endif %}
 
     <form action="", method="POST", enctype="multipart/form-data">
@@ -23,9 +33,10 @@
         {% bootstrap_form form %}
 
         {% if request.resolver_match.url_name == 'signup' %}
-            <button class="btn btn-primary">회원 가입</button>
+            <button class="btn btn-danger float-right">회원 가입</button>
         {% else %}
-            <button class="btn btn-primary">정보 수정</button>
+            <button class="btn btn-danger float-right">정보 수정</button>
         {% endif %}
     </form>
+</div>
 {% endblock %}

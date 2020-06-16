@@ -15,6 +15,7 @@
         {% endfor %}
     {% endif %}
     <div class="d-flex justify-content-around">
+
         {% for top_movie in top_movies %}
             <img src="https://image.tmdb.org/t/p/original/{{ top_movie.0.poster_path }}" class="w-25" alt="..." data-toggle="modal" data-target="#modal-{{ forloop.counter }}">
 
