@@ -5,18 +5,18 @@
 
 {% block css %}
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="{% static 'movies/movie_list.css' %}">
+    <link rel="stylesheet" href="{% static 'movies/movieList.css' %}">
 {% endblock %}
 
 
 {% block content %}
     <div id="app" class="text-center">
 
-        <div class="menu-toggle d-flex justify-content-around">
-            <ul id="multicol-menu" class="nav pull-right">
+        <div class="menu-toggle d-flex bd-highlight">
+            <ul id="multicol-menu" class="nav pull-right p-2 bd-highlight">
                 <li class="dropdown">
-                    <button class="btn btn-outline-primary" class="dropdown-toggle" data-toggle="dropdown">[[ genres[genre] ]]</button>
-                    <div class="dropdown-menu">
+                    <button class="btn btn-outline-light" class="dropdown-toggle" data-toggle="dropdown">[[ genres[genre] ]]</button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                         <div class="row" style="width: 500px;">
                             <p v-for="genre in genres" @click="changeGenre($event)" class="col-3">[[ genre ]]</p>
                         </div>
@@ -24,29 +24,28 @@
                 </li>
             </ul>
 
-            <div v-if="!isSearching" class="dropdown float-right">
-                <button type="button" class="btn btn-outline-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">[[ standards[standard] ]]</button>
+            <div v-if="!isSearching" class="dropdown p-2 bd-hightlight">
+                <button type="button" class="btn btn-outline-light" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">[[ standards[standard] ]]</button>
                 <div class="dropdown-menu">
                 <button v-for="standard in standards" @click="changeStandard($event)" class="dropdown-item" href="#">[[ standard ]]</button>
                 </div>
             </div>
 
-            <div>
+            <div class="ml-auto p-2 bd-highlight">
                 <i class="fas fa-search"></i> <input @keyup.enter="searchMovie" type="text" v-model="searchInput">
-                <button @click="searchMovie" class="btn btn-outline-primary">검색</button>
+                <button @click="searchMovie" class="btn btn-outline-light">검색</button>
             </div>
         </div>
 
-
         <h1 v-if="!isExist">해당하는 영화가 없습니다. DB 업데이트를 기다려주세용!</h1>
         <div v-else class="row">
-            <div v-for="movie in movies" class="card col-3" style="width: 18rem;" :id="getCardId(movie)">
+            <div v-for="movie in movies" class="card col-3 py-3" style="width: 18rem;" :id="getCardId(movie)">
                 <img :src="getMoviePoster(movie)" class="card-img-top" style="height: 400px;">
                 <div class="card-body">
-                    <h5 class="card-title">[[ movie.title ]]</h5>
-                    <p v-text="getMovieOverview(movie)" class="card-text"></p>
-                    <a :href="getReviewUrl(movie)" class="float-left"><button class="btn btn-info">리뷰 보기</button></a>
-                    <button @click="getGenres(movie)" type="button" class="btn btn-primary float-right" data-toggle="modal" :data-target="makeModal(movie)">더보기</button>
+                    <h5 class="card-title font-weight-bold">[[ movie.title ]]</h5>
+                    <p v-text="getMovieOverview(movie)" class="card-text text-secondary"></p>
+                    <a :href="getReviewUrl(movie)" class="float-left"><button class="btn text-white">리뷰 보기</button></a>
+                    <button @click="getGenres(movie)" type="button" class="btn text-white float-right" data-toggle="modal" :data-target="makeModal(movie)">더보기</button>
                 </div>
 
                 <div class="modal fade bd-example-modal-xl" :id="getModal(movie)" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
@@ -71,16 +70,16 @@
                                             <p class="text-left">[[ movie.overview ]]</p>
                                         </div>
                                         <div class="col-4">
-                                            <i v-if="checkLike(movie)" @click="changeLike(movie, $event)" class="fas fa-heart" style="color:red;" data-dismiss="modal">좋아요 취소</i>
+                                            <i v-if="checkLike(movie)" @click="changeLike(movie, $event)" class="far fa-heart" style="color:red;" data-dismiss="modal">취소</i>
                                             <i v-else class="fas fa-heart" @click="changeLike(movie, $event)" style="color:black;">좋아요</i>
 
-                                            <button v-if="checkExclude(movie)" @click="changeExclude(movie, $event)" type="button" class="btn btn-danger exclude-buttons" data-dismiss="modal">실행 취소</button>
-                                            <button v-else type="button" @click="changeExclude(movie, $event)" class="btn btn-danger exclude-buttons" data-dismiss="modal">안 볼거야!</button>
+                                            <i v-if="checkExclude(movie)" @click="changeExclude(movie, $event)" class="far fa-dizzy" style="color:green;" data-dismiss="modal">취소</i>
+                                            <i v-else type="button" @click="changeExclude(movie, $event)" class="far fa-dizzy" style="color:black;" data-dismiss="modal">안 볼래요</i>
                                     
-                                            <button v-if="checkLater(movie)" @click="changeLater(movie, $event)" type="button" class="btn btn-info later-buttons" data-dismiss="modal">안 볼래용</button>
-                                            <button v-else type="button" @click="changeLater(movie, $event)" class="btn btn-info later-buttons" data-dismiss="modal">나중에 볼게요//</button>        
+                                            <i v-if="checkLater(movie)" @click="changeLater(movie, $event)"  class="far fa-grin-alt" style="color:blue;" data-dismiss="modal">취소</i>
+                                            <i v-else type="button" @click="changeLater(movie, $event)" class="far fa-grin-alt" style="color:black;" data-dismiss="modal">나중에 볼래요//</i>        
                                             <hr>
-                                            <p> 최근 5개의 리뷰만 표시됩니다. <button class="btn btn-outline-info">전체 리뷰 보기</button></p>
+                                            <p> 최근 5개의 리뷰만 표시됩니다. <a :href="getReviewUrl(movie)"><button class="btn btn-outline-info">전체 리뷰 보기</button></a></p>
                                             <ul class="text-left">
                                                 <li v-if="reviews.length == 0">작성된 리뷰가 없습니다.</li>
                                                 <li v-else v-for="review in reviews">[[ review ]]</li>
@@ -311,7 +310,7 @@
                         let liked = res.data.liked
                         console.log(liked, like_count)
                         if (liked) {
-                            event.target.innerText = '좋아요 취소'
+                            event.target.innerText = '취소'
                             event.target.style.color = 'red'
                         } else {
                             event.target.innerText = '좋아요'
@@ -325,9 +324,11 @@
                     .then( res => {
                         let exclude = res.data.exclude
                         if (exclude) {
-                            event.target.innerText = '실행 취소'
+                            event.target.innerText = '취소'
+                            event.target.style.color = 'green'
                         } else {
-                            event.target.innerText = '안 볼거야!'
+                            event.target.innerText = '안 볼래요'
+                            event.target.style.color = 'black'
                         }
                         })
                     .catch(error=> {console.log(error)})
@@ -337,9 +338,11 @@
                     .then( res => {
                         let later = res.data.later
                     if (later) {
-                        event.target.innerText = '안 볼거야!'
+                        event.target.innerText = '취소'
+                        event.target.style.color = 'blue'
                     } else {
-                        event.target.innerText = '나중에 볼게요'
+                        event.target.innerText = '나중에 볼래요'
+                        event.target.style.color = 'black'
                     }
                     })
                     .catch(error=> {console.log(error)})

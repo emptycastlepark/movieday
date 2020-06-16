@@ -3,7 +3,8 @@ a:link {
 }
 
 h1 {
-    color: whitesmoke;
+    font-size: 400%;
+    color: rgb(255, 255, 255);
     text-align: center;
 }
 
@@ -13,7 +14,8 @@ h2 {
 
 
 body {
-    background-color: rgb(64, 64, 64);
+    background-image: url('https://news.kbs.co.kr/data/news/2017/12/14/3583064_vap.jpg');
+    background-size: cover;
 }
 
 .container {

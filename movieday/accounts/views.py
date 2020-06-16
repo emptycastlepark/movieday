@@ -6,8 +6,8 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-# Create your views here.
 
 def signup(request):
     if request.user.is_authenticated:
@@ -57,7 +57,6 @@ def update(request, user_id):
             form = CustomUserChangeForm(request.POST, request.FILES, instance=user)
             if form.is_valid():
                 person = form.save()
-                # auth_login(request, person)
                 if not person.profile_image:
                     person.profile_image = '../media/default.jpg'
                     person.save()
@@ -76,10 +75,34 @@ def update(request, user_id):
 def detail(request, user_id):
     User = get_user_model()
     user = get_object_or_404(User, id=user_id)
+    reviews = user.moviereview_set.order_by('-created_at')
+
+    paginator = Paginator(reviews, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    genre_score_dict = dict()
+
+    if len(reviews) > 0:
+        for review in reviews:
+            for genre in review.movie.genres.all():
+                genre_score_dict[genre.name] = genre_score_dict.get(genre.name, []) + [review.score]
+
+    genre_score_average = []
+    for genre in genre_score_dict.keys():
+        average_score = f'{sum(genre_score_dict[genre])/len(genre_score_dict[genre]):.2f}'
+        genre_score_average.append([genre, average_score])
+
+    genre_score_average = sorted(genre_score_average, key=lambda score: score[1], reverse=True)
+
     context = {
         'user': user,
+        'person': request.user,
+        'page_obj': page_obj,
+        'genre_score_average': genre_score_average,
     }
     return render(request, 'accounts/detail.html', context)
+
 
 def get_movies(request, user_id, key):
     User = get_user_model()

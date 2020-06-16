@@ -136,9 +136,9 @@
 
    <!-- 이하 Vue 사용할 계획 -->
     <div id="app">
-      <p id = "status"></p>
       <h2>날씨 기반 추천 (날씨 : [[ weather ]] / 온도 : [[ temperature ]])</h2>
       <p v-if="isFakeLoc">위치 정보가 없어서 개발자의 위치 기준으로 영화가 추천됩니다.</p>
+      <p id = "status"></p>
       <button v-if="isFakeLoc" class="btn btn-outline-primary" @click="getWeather">현재 날씨 기반 추천 받기</button>
       <button class="btn btn-outline-secondary" @click="changeGenre">별로 마음에 안 들어요..</button>
       <h4>[[ recommend_ment ]] [[ recommend_genre ]] 장르 어떠세요?</h4>
