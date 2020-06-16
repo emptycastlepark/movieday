@@ -40,7 +40,7 @@
 
         <h1 v-if="!isExist">해당하는 영화가 없습니다. DB 업데이트를 기다려주세용!</h1>
         <div v-else class="row">
-            <div v-for="movie in movies" class="card col-3" style="width: 18rem;" :id="getCardId(movie)">
+            <div v-for="movie in movies" class="card col-3 py-3" style="width: 18rem;" :id="getCardId(movie)">
                 <img :src="getMoviePoster(movie)" class="card-img-top" style="height: 400px;">
                 <div class="card-body">
                     <h5 class="card-title">[[ movie.title ]]</h5>

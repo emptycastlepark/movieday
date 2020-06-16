@@ -16,6 +16,8 @@
                         <h2>선호 장르</h2>
                         {% for genre in user.like_genres.all %}
                             <button class="btn btn-outline-primary m-2">{{ genre }}</button>
+                        {% empty %}
+                            <h3>등록된 선호 장르가 없습니다!</h3>
                         {% endfor %}
                     </div>
                 </div>
@@ -32,7 +34,9 @@
                         <img :src="getMoviePoster(movie)" class="card-img-top" alt="...">
                         <div class="card-body">
                             <h5 class="card-title">[[ movie.title ]]</h5>
-                            <button @click="changeState(movie, $event)" class="btn btn-outline-danger">[[ nowState ]]</button>
+                            {% if request.user == user %}
+                                <button @click="changeState(movie, $event)" class="btn btn-outline-danger">[[ nowState ]]</button>
+                            {% endif %}
                             <button class="btn btn-outline-primary" data-toggle="modal" :data-target="makeModal(movie)">더 보기</button>
                         </div>
                         
