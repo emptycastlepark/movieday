@@ -12,6 +12,10 @@
   <form action="", method="POST">
     {% csrf_token %}
     {% bootstrap_form form %}
-    <button class="btn btn-primary">글 작성</button>
+    {% if request.resolver_match.url_name == 'article_create' %}
+        <button class="btn btn-danger">글 작성</button>
+    {% else %}
+        <button class="btn btn-danger">수정 완료</button>
+    {% endif %}
   </form>
 {% endblock %}

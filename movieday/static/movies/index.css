@@ -3,7 +3,8 @@ a:link {
 }
 
 h1 {
-    color: whitesmoke;
+    font-size: 400%;
+    color: rgb(255, 255, 255);
     text-align: center;
 }
 
