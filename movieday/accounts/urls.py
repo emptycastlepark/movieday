@@ -10,4 +10,5 @@ urlpatterns = [
     path('update/<int:user_id>/', views.update, name='update'),
     path('detail/<int:user_id>/', views.detail, name='detail'),
     path('get_movies/<int:user_id>/<int:key>/', views.get_movies, name="get_movies"),
+    path('get_reviews/<int:user_id>/<int:page>/', views.get_reviews, name="get_reviews"),
 ]

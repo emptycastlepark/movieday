@@ -1,0 +1,43 @@
+body {
+    background-color: rgb(0, 0, 0);
+}
+
+h2 {
+    color: rgb(255, 255, 255);
+}
+
+h4 {
+    color: rgb(255, 255, 255);
+}
+
+p {
+    color: rgb(128, 128, 128)
+}
+
+.carousel-img {
+    height: 200px;
+}
+
+.weather-button {
+    background: transparent;
+    color: rgb(255, 255, 255);
+    border: 1px solid white;
+    border-radius: 7px;
+    margin-top: 10px;
+}
+
+.recommendations {
+    box-sizing: border-box;
+    height: 300px;
+}
+
+.carousel-item > .row > img {
+    display: block;
+    transition: all 0.3s ease-in-out;
+}
+
+.carousel-item > .row > img:hover {
+    transform: scale(1.2);
+    transition: transform.5s;
+    cursor: pointer;
+}

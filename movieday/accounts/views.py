@@ -6,6 +6,8 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
+from movies.models import Movie
+
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
@@ -93,7 +95,7 @@ def detail(request, user_id):
         average_score = f'{sum(genre_score_dict[genre])/len(genre_score_dict[genre]):.2f}'
         genre_score_average.append([genre, average_score])
 
-    genre_score_average = sorted(genre_score_average, key=lambda score: score[1], reverse=True)
+    genre_score_average = sorted(genre_score_average, key=lambda score: float(score[1]), reverse=True)
 
     context = {
         'user': user,
@@ -115,3 +117,16 @@ def get_movies(request, user_id, key):
         movies = list(user.exclude_movies.all().values())
 
     return JsonResponse({'movies': movies}, status = 200)
+
+def get_reviews(request, user_id, page):
+    User = get_user_model()
+    user = get_object_or_404(User, id=user_id)
+    max_review_page = user.moviereview_set.count() // 10 + 1
+
+    reviews = list(user.moviereview_set.order_by('-created_at').values()[(page-1)*10:page*10])
+    review_movies = dict()
+    for review in reviews:
+        temp_movie = get_object_or_404(Movie, id = review['movie_id'])
+        review_movies[temp_movie.id] = temp_movie.title
+
+    return JsonResponse({'reviews': reviews, 'review_movies': review_movies, 'max_review_page': max_review_page}, status = 200)

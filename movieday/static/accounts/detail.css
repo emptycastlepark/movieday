@@ -1,0 +1,31 @@
+body {
+    background-color: black;
+}
+
+.user-page {
+    background-color: whitesmoke;
+}
+
+table {
+    text-align: center;;
+}
+
+th:first-child {
+    color: red;
+    width: 15%;
+}
+
+th:nth-child(2) {
+    color: blue;
+    width: 40%;
+}
+
+th:nth-child(3) {
+    color: yellow;
+    width: 15%;
+}
+
+th:last-child {
+    color: orange;
+    width: 30%;
+}
