@@ -57,7 +57,6 @@ def update(request, user_id):
             form = CustomUserChangeForm(request.POST, request.FILES, instance=user)
             if form.is_valid():
                 person = form.save()
-                # auth_login(request, person)
                 if not person.profile_image:
                     person.profile_image = '../media/default.jpg'
                     person.save()
@@ -86,7 +85,6 @@ def detail(request, user_id):
 
     if len(reviews) > 0:
         for review in reviews:
-            print(review.movie.genres.all(), review.score)
             for genre in review.movie.genres.all():
                 genre_score_dict[genre.name] = genre_score_dict.get(genre.name, []) + [review.score]
 
@@ -99,6 +97,7 @@ def detail(request, user_id):
 
     context = {
         'user': user,
+        'person': request.user,
         'page_obj': page_obj,
         'genre_score_average': genre_score_average,
     }
