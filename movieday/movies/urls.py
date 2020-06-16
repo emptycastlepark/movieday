@@ -7,6 +7,7 @@ urlpatterns = [
     path('movie_recommend/', views.movie_recommend, name='movie_recommend'),
     path('movie_upcoming/', views.movie_upcoming, name='movie_upcoming'),
 
+    path('review_top_movie/', views.review_top_movie, name='review_top_movie'),
     path('review_list/', views.review_list, name='review_list'),
     path('review_list_movie/<int:movie_id>/', views.review_list_movie, name="review_list_movie"),
     path('review/<int:review_id>/', views.review_detail, name="review_detail"),
@@ -27,5 +28,4 @@ urlpatterns = [
     path('make_review/<int:movie_id>/', views.make_review, name='make_review'),
     path('get_movie_recommend/<str:weather>/<str:temp>/', views.get_movie_recommend, name='get_movie_recommend'),
 
-    path('testing/', views.testing, name='testing'),
 ]

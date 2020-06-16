@@ -1,0 +1,37 @@
+body {
+    background-color: rgb(0, 0, 0);
+}
+
+h1 {
+    color: rgb(255, 255, 255);
+    margin: 50px 0;
+}
+
+p {
+    margin: 0;
+}
+
+.top-movies {
+    display: flex;
+    justify-content:space-around;
+}
+
+.top-movies > img {
+    border-radius: 50px;
+    transition: all 0.5s ease-in-out;
+}
+
+.top-movies > img:hover {
+    transform: scale(1.2);
+    transition: transform.5s;
+    cursor: pointer;
+}
+
+.change-button {
+    color: rgb(255, 255, 255);
+    background: transparent;
+    border: none;
+    font-size: medium;
+    vertical-align: super;
+    float: right;
+}

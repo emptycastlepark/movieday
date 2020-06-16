@@ -14,8 +14,7 @@ h2 {
 
 
 body {
-    background-image: url('https://news.kbs.co.kr/data/news/2017/12/14/3583064_vap.jpg');
-    background-size: cover;
+    background-color: rgb(0, 0, 0);
 }
 
 .container {

@@ -90,12 +90,20 @@ def movie_upcoming(request):
 
 
 def review_list(request):
-    reviews = MovieReview.objects.order_by('-id')
+    reviews = MovieReview.objects.order_by('-created_at')
 
     paginator = Paginator(reviews, 10)
 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
+
+    context = {
+        'reviews': reviews,
+        'page_obj': page_obj,
+    }
+    return render(request, 'movies/review_list.html', context)
+
+def review_top_movie(request):
 
     top_movie_totals = MovieReview.objects.values('movie').annotate(total=Avg('score')).order_by('-total')[:3]
 
@@ -109,15 +117,13 @@ def review_list(request):
     top_movies = [[first_movie, first_movies['total']], [second_movie, second_movies['total']], [last_movie, last_movies['total']]]
 
     context = {
-        'reviews': reviews,
-        'page_obj': page_obj,
         'top_movies': top_movies,
     }
-    return render(request, 'movies/review_list.html', context)
+    return render(request, 'movies/review_top_movie.html', context)
 
 def review_list_movie(request, movie_id):
     movie = get_object_or_404(Movie, id=movie_id)
-    reviews = MovieReview.objects.filter(movie_id=movie.id)
+    reviews = MovieReview.objects.filter(movie_id=movie.id).order_by('-created_at')
     paginator = Paginator(reviews, 10)
 
     page_number = request.GET.get('page')
@@ -401,10 +407,3 @@ def helper_function(input_list):
 
     return sliced_list
 
-
-
-def testing(request):
-    context = {
-        'SECRET_KEY_KOBIS_API_KEY': SECRET_KEY_KOBIS_API_KEY
-    }
-    return render(request, 'movies/testing.html', context)

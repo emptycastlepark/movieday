@@ -4,7 +4,7 @@
 
 {% block css %}
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="{% static 'movies/review_list.css' %}">
+    <link rel="stylesheet" href="{% static 'movies/reviewList.css' %}">
 {% endblock %}
 
 
@@ -14,58 +14,9 @@
             <div class="alert alert-danger" role="alert">{{ message }} 기존 리뷰로 이동하시려면 <a href="{% url 'movies:review_detail' message.extra_tags %}">여기</a>를 클릭해주세요.</div>
         {% endfor %}
     {% endif %}
-    <div class="d-flex justify-content-around">
 
-        {% for top_movie in top_movies %}
-            <img src="https://image.tmdb.org/t/p/original/{{ top_movie.0.poster_path }}" class="w-25" alt="..." data-toggle="modal" data-target="#modal-{{ forloop.counter }}">
-
-            <div class="modal fade" id="modal-{{ forloop.counter }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-xl">
-                    
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">{{ top_movie.0.title }} ({{ top_movie.0.original_title }})</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="container-fluid">
-                                <div class="row">
-                                    <div class="col-8">
-                                        <h3>{{ top_movie.0.title }}<br>({{ top_movie.0.original_title }})</h3>
-                                        <img src="https://image.tmdb.org/t/p/original/{{ top_movie.0.backdrop_path }}" class="card-img-top" alt="...">
-                                        <p>{{ top_movie.0.overview }}</p>
-                                    </div>
-                                    <div class="col-4">
-                                        <button class='btn btn-outline-success float-right'>{{ top_movie.0.vote_average }}</button>
-                                        <h5>개봉일 : {{ top_movie.0.release_date }}</h5>
-                                        <hr>
-                                        {% for genre in top_movie.0.genres.all %}
-                                            <button type="button" class="btn btn-outline-secondary animated infinite swing delay-1s slow mx-2 my-2">{{ genre }}</button>
-                                        {% endfor %}
-                                        <hr>
-                                        <h3> 최근 5개 리뷰</h3>
-                                        {% for review in top_movie.0.moviereview_set.all|slice:":5" %}
-                                            {{review.author}} : {{ review.content }} - {{review.score}}점
-                                        {% endfor %}
-                                        <hr>
-                                        <a href="{% url 'movies:review_list_movie' top_movie.0.id %}"><button class="btn btn-outline-info">전체 리뷰 보기</button></a>
-                                        <a href="{% url 'movies:review_create' top_movie.0.id %}"><button class="btn btn-outline-info">리뷰 작성</button></a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        {% endfor %}
-    </div>
-
-    <h1 class="my-5">리뷰 리스트</h1>
-    <a href="{% url 'movies:review_create_withoutmovie' %}">리뷰쓰러 가기</a>
-
-    <table class="table">
+    <h1 class="my-5">리뷰 리스트<a href="{% url 'movies:review_top_movie' %}"><button class="change-button">Top Movie 보기</button></a></h1>
+    <table>
         <thead>
         <tr>
             <th>영화 제목</th>
@@ -78,8 +29,8 @@
         
         <tbody>
         <tr>
-            <td><a href="" class="text-decoration-none" data-toggle="modal" data-target="#modal-{{review.movie_id}}">{{ review.movie }}</a></td>
-            <td>{{ review.content }}</td>
+            <td><p class="review-title" data-toggle="modal" data-target="#modal-{{review.movie_id}}">{{ review.movie|truncatechars:20 }}</p></td>
+            <td>{{ review.content|truncatechars:29 }}</td>
             <td>{{ review.score}}</td>
             <td>{{ review.author }}</td>
             <div class="modal fade" id="modal-{{review.movie_id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -107,10 +58,11 @@
         </tbody>
         {% endfor %}
     </table>
+    
+    <a class="review-making-button" href="{% url 'movies:review_create_withoutmovie' %}">리뷰쓰러 가기</a>
 
     <div class="d-flex justify-content-center">{% bootstrap_paginate page_obj range=10 show_prev_next="false" show_first_last="true"%}</div>
 {% endblock %}
-
 
 
 
