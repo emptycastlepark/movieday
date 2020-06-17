@@ -4,7 +4,7 @@
 
 {% block css %}
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="{% static 'movies/review_create.css' %}">
+    <link rel="stylesheet" href="{% static 'movies/reviewUpdate.css' %}">
 {% endblock %}
 
 
@@ -22,7 +22,7 @@
                 <form action="" method="POST">
                     {% csrf_token %}
                     {% bootstrap_form form %}
-                    <button class="btn btn-primary">수정 완료</button>
+                    <button class="float-right btn btn-danger">수정 완료</button>
                 </form>
             </div>
         </div>
