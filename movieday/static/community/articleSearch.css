@@ -1,0 +1,27 @@
+body {
+  background-color: rgb(0, 0, 0);
+}
+
+h1, h4 {
+  color: rgb(255, 255, 255);
+}
+
+.table {
+  color: rgb(255, 255, 255)
+}
+
+body > div.container > div.d-flex.justify-content-center > ul > li > a,
+body > div.container > div.d-flex.justify-content-center > ul > li > span {
+    background-color: black;
+    color: rgb(255, 255, 255);
+    border: 1px solid white;
+}
+
+body > div.container > div.d-flex.justify-content-center > ul > li > a:hover,
+body > div.container > div.d-flex.justify-content-center > ul > li > a:focus,
+body > div.container > div.d-flex.justify-content-center > ul > li > span:hover
+body > div.container > div.d-flex.justify-content-center > ul > li > span:focus {
+    background-color: rgb(128, 128, 128);
+    color: rgb(255, 255, 255);
+    border: 1px solid white;
+}
