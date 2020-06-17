@@ -4,18 +4,20 @@
 
 {% block css %}
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="{% static 'community/article_create.css' %}">
+    <link rel="stylesheet" href="{% static 'community/articleCreate.css' %}">
 {% endblock %}
 
 {% block content %}
-  <h1>글 작성</h1>
-  <form action="", method="POST">
-    {% csrf_token %}
-    {% bootstrap_form form %}
-    {% if request.resolver_match.url_name == 'article_create' %}
-        <button class="btn btn-danger">글 작성</button>
-    {% else %}
-        <button class="btn btn-danger">수정 완료</button>
-    {% endif %}
-  </form>
+    <div class="w-50 mx-auto">
+      <h1>글 작성</h1>
+        <form action="", method="POST">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            {% if request.resolver_match.url_name == 'article_create' %}
+                <button class="float-right btn btn-danger">글 작성</button>
+            {% else %}
+                <button class="float-righ btn btn-danger">수정 완료</button>
+            {% endif %}
+        </form>
+    </div>
 {% endblock %}
