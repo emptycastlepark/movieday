@@ -2,11 +2,31 @@ body {
     background-color: rgb(0, 0, 0);
 }
 
-h1 {
+h1, .card-title, #current-year-month, .modal-button, .change-button {
     color: rgb(255, 255, 255);
 }
 
+.card {
+    background-color: rgb(0, 0, 0);
+}
+
+.card-text {
+    color: rgb(128, 128, 128);
+}
 
 .poster-img {
-    height: 300px;
+    height: 350px;
+}
+
+.change-button:hover,
+.modal-button:hover {
+    cursor: pointer;
+}
+
+.card-title {
+    height: 48px;
+}
+
+.card-text {
+    height: 72px;
 }

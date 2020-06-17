@@ -45,25 +45,24 @@ td {
 
 
 th:first-child {
-    color: red;
     width: 30%;
 }
 
 th:nth-child(2) {
-    color: blue;
     width: 40%;
 }
 
 th:nth-child(3) {
-    color: yellow;
     width: 15%;
 }
 
 th:last-child {
-    color: orange;
     width: 15%;
 }
 
+td:first-child {
+    color: orange;
+}
 
 .review-making-button {
     color: white;
@@ -87,9 +86,7 @@ body > div.container > div.d-flex.justify-content-center > ul > li > span {
 }
 
 body > div.container > div.d-flex.justify-content-center > ul > li > a:hover,
-body > div.container > div.d-flex.justify-content-center > ul > li > a:focus,
-body > div.container > div.d-flex.justify-content-center > ul > li > span:hover
-body > div.container > div.d-flex.justify-content-center > ul > li > span:focus {
+body > div.container > div.d-flex.justify-content-center > ul > li > span:hover {
     background-color: rgb(128, 128, 128);
     color: rgb(255, 255, 255);
     border: 1px solid white;

@@ -35,7 +35,7 @@
                                     <div class="col-4">
                                         <div class="d-flex justify-content-between">
                                             <h5 class="d-inline-block my-auto">개봉일 : {{ top_movie.0.release_date }}</h5>
-                                            <button class='btn btn-outline-success d-inline-block'>{{ top_movie.0.vote_average }}</button>
+                                            <button class='btn btn-outline-success d-inline-block'>{{ top_movie.1 }}</button>
                                         </div>
                                         <hr class="mb-0">
                                         {% for genre in top_movie.0.genres.all %}
@@ -44,7 +44,8 @@
                                         <hr>
                                         <h3> 최근 5개 리뷰</h3>
                                         {% for review in top_movie.0.moviereview_set.all|slice:":5" %}
-                                            {{review.author}} : {{ review.content }} - {{review.score}}점
+                                            <p class="w-100">{{review.author}} - {{review.score}}점</p>
+                                            <p class="w-100">{{ review.content|truncatechars:23 }}</p>
                                         {% endfor %}
                                         <hr>
                                         <a href="{% url 'movies:review_list_movie' top_movie.0.id %}"><button class="btn btn-outline-info">전체 리뷰 보기</button></a>
