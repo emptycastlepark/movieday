@@ -2,21 +2,21 @@
 {% load bootstrap_pagination %}
 
 {% block css %}
-    <!-- Custom CSS -->
-    <link rel="stylesheet" type="text/css" href="/static/movies/index.css">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" type="text/css" href="/static/movies/index.css">
 {% endblock %}
 
 
 {% block content %}
-    <div class="row h-100 align-items-center">
-        <div class="mx-auto">
-            <h1>지금 바로 {{ movie_count }}개의 영화 정보와<br>{{ review_count }}개의 리뷰를 만나보세요!</h1>
-            <div class="text-center my-5">
-                {% if request.user.is_authenticated %}
-                    <a href="{% url 'movies:movie_list' %}"><button class="btn btn-danger">영화 목록으로 이동</button></a>
-                {% endif %}
-            </div>
-        </div>
+  <div class="row h-100 align-items-center">
+    <div class="mx-auto">
+      <h1>지금 바로 {{ movie_count }}개의 영화 정보와<br>{{ review_count }}개의 리뷰를 만나보세요!</h1>
+      <div class="text-center my-5">
+        {% if request.user.is_authenticated %}
+          <a href="{% url 'movies:movie_list' %}"><button class="btn btn-danger">영화 목록으로 이동</button></a>
+        {% endif %}
+      </div>
     </div>
+  </div>
 
 {% endblock %}

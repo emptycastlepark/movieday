@@ -2,96 +2,92 @@
 {% load static %}
 
 {% block css %}
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="{% static 'movies/movieUpcoming.css' %}">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="{% static 'movies/movieUpcoming.css' %}">
 {% endblock %}
 
 
 {% block content %}
-
-<!-- 이하 Vue 인스턴스 사용할 계획 -->
-    <div id="app">
-        <div v-if="isList">
-            <div class="d-flex justify-content-between">
-                <h1>상영 예정 영화 (총 [[ countMovies ]]개)</h1><p @click="changeComponent" class="change-button">월 별로 보기</p>
-            </div>
-            
-            <div class="row">
-                <div v-for="upcomingMovie in getCurMovies" class="card col-3" style="width: 18rem;">
-                    <img :src="getPosterUrl(upcomingMovie)" class="card-img-top poster-img">
-                    <div class="card-body">
-                        <h5 class="card-title">[[ upcomingMovie.title ]]</h5>
-                        <p v-if="hasOverView(upcomingMovie)" class="card-text">[[ getOverView(upcomingMovie) ]]</p>
-                        <p v-else class="card-text">입력된 줄거리가 없습니다.</p>
-                        <p class="modal-button float-right" data-toggle="modal" :data-target="makeModalId(upcomingMovie)">더보기</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="text-center my-4">
-                <div class="btn-group" role="group" aria-label="Basic example">
-                    <button @click="changePage" v-for="number in maxPage" type="button" class="btn btn-outline-secondary">[[ number ]]</button>
-                </div>
-            </div>
+  <div id="app">
+    <div v-if="isList">
+      <div class="d-flex justify-content-between">
+        <h1>상영 예정 영화 (총 [[ countMovies ]]개)</h1><p @click="changeComponent" class="change-button">월 별로 보기</p>
+      </div>
+      
+      <div class="row">
+        <div v-for="upcomingMovie in getCurMovies" class="card col-3" style="width: 18rem;">
+          <img :src="getPosterUrl(upcomingMovie)" class="card-img-top poster-img">
+          <div class="card-body">
+            <h5 class="card-title">[[ upcomingMovie.title ]]</h5>
+            <p v-if="hasOverView(upcomingMovie)" class="card-text">[[ getOverView(upcomingMovie) ]]</p>
+            <p v-else class="card-text">입력된 줄거리가 없습니다.</p>
+            <p class="modal-button float-right" data-toggle="modal" :data-target="makeModalId(upcomingMovie)">더보기</p>
+          </div>
         </div>
+      </div>
 
-        <div v-else>
-            <div class="d-flex justify-content-between">
-                <h1>상영 예정 영화 (총 [[ countMovies ]]개)</h1><p @click="changeComponent" class="change-button">리스트로 보기</p>
-            </div>
-
-            <div class="row">
-                <button v-if="!isFirstMonth" @click="movePrev" id="prev" class="btn btn-outline-light col-2"><</button>
-                <div v-else class="col-2"></div>
-                <h3 id="current-year-month" class="col-8 text-center">[[ year ]]년 [[ month+1 ]]월</h3>
-                <button v-if="!isLastMonth" @click="moveNext" id="next" class="btn btn-outline-light col-2">></button>
-                <div v-else class="col-2"></div>
-                
-                <div v-for="upcomingMovie in upcomingMonth" class="card col-3" style="width: 18rem;">
-                    <img :src="getPosterUrl(upcomingMovie)" class="card-img-top poster-img">
-                    <div class="card-body">
-                        <h5 class="card-title">[[ upcomingMovie.title ]]</h5>
-                        <p v-if="hasOverView(upcomingMovie)" class="card-text">[[ getOverView(upcomingMovie) ]]</p>
-                        <p v-else class="card-text">입력된 줄거리가 없습니다.</p>
-                        <p class="modal-button float-right" data-toggle="modal" :data-target="makeModalId(upcomingMovie)">더보기</p>
-                    </div>
-                </div>
-
-                <div v-if="upcomingMonth.length == 0" ><h2>개봉 예정 영화가 없습니다.</h2></div>
-            </div>
-
+      <div class="text-center my-4">
+        <div class="btn-group" role="group" aria-label="Basic example">
+          <button @click="changePage" v-for="number in maxPage" type="button" class="btn btn-outline-secondary">[[ number ]]</button>
         </div>
-
-        <div v-for="upcomingMovie in upcomingMovies" class="modal fade" :id="getModalId(upcomingMovie)" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLongTitle">[[ upcomingMovie.title ]] ([[upcomingMovie.original_title ]])</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <img :src="getPosterUrl(upcomingMovie)" class="card-img-top" alt="...">
-                <div class="modal-body">
-                    <p>개봉일 : [[ upcomingMovie.release_date ]]</p>
-                    <hr>
-                    <h3>줄거리</h3>
-                    <p v-if="hasOverView(upcomingMovie)">[[ upcomingMovie.overview ]]</p>
-                    <p v-else>입력된 줄거리가 없습니다.</p>
-                    <button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Close</button>
-                </div>
-                </div>
-            </div>
-        </div>
-
-
+      </div>
     </div>
+
+    <div v-else>
+      <div class="d-flex justify-content-between">
+        <h1>상영 예정 영화 (총 [[ countMovies ]]개)</h1><p @click="changeComponent" class="change-button">리스트로 보기</p>
+      </div>
+
+      <div class="row">
+        <button v-if="!isFirstMonth" @click="movePrev" id="prev" class="btn btn-outline-light col-2"><</button>
+        <div v-else class="col-2"></div>
+        <h3 id="current-year-month" class="col-8 text-center">[[ year ]]년 [[ month+1 ]]월</h3>
+        <button v-if="!isLastMonth" @click="moveNext" id="next" class="btn btn-outline-light col-2">></button>
+        <div v-else class="col-2"></div>
+        
+        <div v-for="upcomingMovie in upcomingMonth" class="card col-3" style="width: 18rem;">
+          <img :src="getPosterUrl(upcomingMovie)" class="card-img-top poster-img">
+          <div class="card-body">
+            <h5 class="card-title">[[ upcomingMovie.title ]]</h5>
+            <p v-if="hasOverView(upcomingMovie)" class="card-text">[[ getOverView(upcomingMovie) ]]</p>
+            <p v-else class="card-text">입력된 줄거리가 없습니다.</p>
+            <p class="modal-button float-right" data-toggle="modal" :data-target="makeModalId(upcomingMovie)">더보기</p>
+          </div>
+        </div>
+
+        <div v-if="upcomingMonth.length == 0">
+          <h2>개봉 예정 영화가 없습니다.</h2>
+        </div>
+      </div>
+    </div>
+
+    <div v-for="upcomingMovie in upcomingMovies" class="modal fade" :id="getModalId(upcomingMovie)" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">[[ upcomingMovie.title ]] ([[upcomingMovie.original_title ]])</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <img :src="getPosterUrl(upcomingMovie)" class="card-img-top" alt="...">
+          <div class="modal-body">
+            <p>개봉일 : [[ upcomingMovie.release_date ]]</p>
+            <hr>
+            <h3>줄거리</h3>
+            <p v-if="hasOverView(upcomingMovie)">[[ upcomingMovie.overview ]]</p>
+            <p v-else>입력된 줄거리가 없습니다.</p>
+            <button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}
 
 
 {% block vue %}
-
-<script>
+  <script>
     const today = new Date();
 
     const app = new Vue({
@@ -112,147 +108,144 @@
       },
       methods: {
         changeComponent() {
-            this.isList = !this.isList   
-            for (let number=0; number<this.upcomingMovies.length; number++) {
-                temp_date = this.upcomingMovies[number].release_date.split("-")
-                if ((temp_date[0] > this.lastYear) && (temp_date[1] > this.lastMonth)) {
-                    this.lastYear = temp_date[0]
-                    this.lastMonth = temp_date[1]
-                }
+          this.isList = !this.isList   
+          for (let number=0; number<this.upcomingMovies.length; number++) {
+            temp_date = this.upcomingMovies[number].release_date.split("-")
+            if ((temp_date[0] > this.lastYear) && (temp_date[1] > this.lastMonth)) {
+              this.lastYear = temp_date[0]
+              this.lastMonth = temp_date[1]
             }
-            this.year = this.changeMonth(this.year, this.month)[0]
-            this.month = this.changeMonth(this.year, this.month)[1]
-            this.upcomingMonth = this.changeMonth(this.year, this.month)[2]
+          }
+          this.year = this.changeMonth(this.year, this.month)[0]
+          this.month = this.changeMonth(this.year, this.month)[1]
+          this.upcomingMonth = this.changeMonth(this.year, this.month)[2]
         },
         movePrev() {
           let year = this.year
           let month = this.month
           while(true) {
-              month -= 1
-              if (month == -1) {
-                month = 11
-                year -= 1
-              }
-              res = this.changeMonth(year, month)
-              if (res[2].length > 0) {
-                  this.year = res[0]
-                  this.month = res[1]
-                  this.upcomingMonth = res[2]
-                  break
-              } 
+            month -= 1
+            if (month == -1) {
+              month = 11
+              year -= 1
+            }
+            res = this.changeMonth(year, month)
+            if (res[2].length > 0) {
+              this.year = res[0]
+              this.month = res[1]
+              this.upcomingMonth = res[2]
+              break
+            } 
           }
         },
         moveNext() {
           let year = this.year
           let month = this.month
           while(true) {
-              month += 1
-              if (month == 12) {
-                month = 0
-                year += 1
-              }
-              res = this.changeMonth(year, month)
-              if (res[2].length > 0) {
-                  this.year = res[0]
-                  this.month = res[1]
-                  this.upcomingMonth = res[2]
-                  break
-              } 
+            month += 1
+            if (month == 12) {
+              month = 0
+              year += 1
+            }
+            res = this.changeMonth(year, month)
+            if (res[2].length > 0) {
+              this.year = res[0]
+              this.month = res[1]
+              this.upcomingMonth = res[2]
+              break
+            } 
           }
         },
         getUpcomingMovies(month, date) {
-            let formatedmonth = 0
-            let formateddate = 0
+          let formatedmonth = 0
+          let formateddate = 0
 
-            if (month < 9) {
-                formatedmonth = '0' + (month+1)
-            } else {
-                formatedmonth = (month+1)
-            }
+          if (month < 9) {
+            formatedmonth = '0' + (month+1)
+          } else {
+            formatedmonth = (month+1)
+          }
 
-            if (date < 9) {
-                formateddate = '0' + date
-            } else {
-                formateddate = date
-            }
+          if (date < 9) {
+            formateddate = '0' + date
+          } else {
+            formateddate = date
+          }
 
-            const movieUrlAll = `https://api.themoviedb.org/3/discover/movie?api_key=${this.MOVIE_API_KEY}&language=ko-KR&region=KR&page=1&primary_release_date.gte=${this.year}-${formatedmonth}-${formateddate}`
-            axios.get(movieUrlAll)
+          const movieUrlAll = `https://api.themoviedb.org/3/discover/movie?api_key=${this.MOVIE_API_KEY}&language=ko-KR&region=KR&page=1&primary_release_date.gte=${this.year}-${formatedmonth}-${formateddate}`
+          axios.get(movieUrlAll)
+            .then(res => {
+              let totalPage = res.data.total_pages
+              this.maxPage = totalPage
+              this.upcomingMovies = [...this.upcomingMovies, ...res.data.results]
+              for (let page=2; page<=totalPage; page++) {
+                let movieUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${this.MOVIE_API_KEY}&language=ko-KR&region=KR&page=${page}&primary_release_date.gte=${this.year}-${formatedmonth}-${formateddate}`
+                axios.get(movieUrl)
                 .then(res => {
-                    let totalPage = res.data.total_pages
-                    this.maxPage = totalPage
-                    this.upcomingMovies = [...this.upcomingMovies, ...res.data.results]
-                    for (let page=2; page<=totalPage; page++) {
-                        let movieUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${this.MOVIE_API_KEY}&language=ko-KR&region=KR&page=${page}&primary_release_date.gte=${this.year}-${formatedmonth}-${formateddate}`
-                        axios.get(movieUrl)
-                        .then(res => {
-                            this.upcomingMovies = [...this.upcomingMovies, ...res.data.results]
-                        })
-                    }
+                  this.upcomingMovies = [...this.upcomingMovies, ...res.data.results]
                 })
-                .catch(err => console.log(err))
+              }
+            })
+            .catch(err => console.log(err))
         },
         changePage(event) {
-            this.curPage = parseInt(event.target.innerText)
-            this.scrollToTop()
+          this.curPage = parseInt(event.target.innerText)
+          this.scrollToTop()
         },
         getPosterUrl(movie) {
-            if (movie.poster_path == null) {
-                return `/static/movies/no_poster.jpg`
-            } else {
-                return `https://image.tmdb.org/t/p/original/${movie.poster_path}`
-            }
+          if (movie.poster_path == null) {
+            return `/static/movies/no_poster.jpg`
+          } else {
+            return `https://image.tmdb.org/t/p/original/${movie.poster_path}`
+          }
         },
         changeMonth(year, month) {
-            upcomingMonth = []
-            for (let number=0; number<this.upcomingMovies.length; number++) {
-                movie_date = this.upcomingMovies[number].release_date.split("-")
-                if ((month+1 == movie_date[1]) && (year == movie_date[0])) {
-                    upcomingMonth.push(this.upcomingMovies[number])
-                }
+          upcomingMonth = []
+          for (let number=0; number<this.upcomingMovies.length; number++) {
+            movie_date = this.upcomingMovies[number].release_date.split("-")
+            if ((month+1 == movie_date[1]) && (year == movie_date[0])) {
+              upcomingMonth.push(this.upcomingMovies[number])
             }
-            return [year, month, upcomingMonth]
+          }
+          return [year, month, upcomingMonth]
         },
         makeModalId(movie) {
-            return `#modal-${movie.id}`
+          return `#modal-${movie.id}`
         },
         getModalId(movie) {
-            return `modal-${movie.id}`
+          return `modal-${movie.id}`
         },
         getOverView(movie) {
-            return movie.overview.substr(0, 30) + '...'
+          return movie.overview.substr(0, 30) + '...'
         },
         hasOverView(movie) {
-            if (movie.overview) {
-                return true
-            } else {
-                return false
-            }
+          if (movie.overview) {
+            return true
+          } else {
+            return false
+          }
         },
         scrollToTop () {
-        scroll(0, 0)
+          scroll(0, 0)
         },
       },
       computed: {
         countMovies() {
-            return this.upcomingMovies.length
+          return this.upcomingMovies.length
         },
         isFirstMonth() {
-            return (today.getMonth()==this.month) && (today.getFullYear()==this.year)
+          return (today.getMonth()==this.month) && (today.getFullYear()==this.year)
         },
         isLastMonth() {
-            return (this.month+1==this.lastMonth) && (this.year==this.lastYear)
+          return (this.month+1==this.lastMonth) && (this.year==this.lastYear)
         },
         getCurMovies() {
-            return this.upcomingMovies.slice((this.curPage-1)*20, this.curPage*20)
+          return this.upcomingMovies.slice((this.curPage-1)*20, this.curPage*20)
         },
-      },
-      created() {
       },
       mounted() {
         this.getUpcomingMovies(today.getMonth(), today.getDate())
       }
     })
-</script>
-
+  </script>
 {% endblock %}

@@ -1,0 +1,16 @@
+body {
+  background-color: rgb(0, 0, 0);
+}
+
+.form-check {
+  display: inline-block;
+  margin: 5px 5px;
+}
+
+label {
+  color: white;
+}
+
+#id_profile_image {
+  color:gray;
+}

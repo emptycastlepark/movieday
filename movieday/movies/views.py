@@ -115,6 +115,7 @@ def review_top_movie(request):
     last_movie = Movie.objects.get(id=last_movies['movie'])
 
     top_movies = [[first_movie, first_movies['total']], [second_movie, second_movies['total']], [last_movie, last_movies['total']]]
+    print(messages.get_messages(request))
 
     context = {
         'top_movies': top_movies,

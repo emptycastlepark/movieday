@@ -3,244 +3,239 @@
 {% load static %}
 
 {% block css %}
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="{% static 'accounts/detail.css' %}">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="{% static 'accounts/detail.css' %}">
 {% endblock %}
 
 {% block content %}
-    <div id="app">
-        <div class="row">
-            <div v-if="isWhere==0" class="col-10 user-page">
-                <div class="row">
-                    <img class="col-4" src="{{ user.profile_image.url }}">
-                    <div class="col-8">
-                        <h1>{{ user.username }}({{ user.nickname }})님</h2>
-                        {% if request.user == user %}
-                            <a class="nav-link text-black" href="{% url 'accounts:update' user.id %}">개인정보 수정하기</a>
-                        {% endif %}
-                        <h2>선호 장르</h2>
-                        {% for genre in user.like_genres.all %}
-                            <button class="btn btn-outline-primary m-2">{{ genre }}</button>
-                        {% empty %}
-                            <h3>등록된 선호 장르가 없습니다!</h3>
-                        {% endfor %}
-                    </div>
-                </div>
-                <div class="row mt-4">
-                    <h1 class="col-12">장르별 평균 평점</h1>
-                    {% for score in genre_score_average %}
-                        <div class="col-3 text-center my-2">
-                            <button class="btn btn-outline-primary">{{ score.0 }}</button>
-                            <h5>{{ score.1 }}점</h5>
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-            <div v-if="isWhere==1" class="col-10 user-page">
-                <div class="row">
-                    
-                    <h1 v-if="isEmpty">분류된 영화가 없습니다.</h1>
-                    <div v-else v-for="movie in movies" class="card col-3" style="width: 18rem;">
-                        <img :src="getMoviePoster(movie)" class="card-img-top poster-img" alt="...">
-                        <div class="card-body">
-                            <h5 class="card-title">[[ movie.title ]]</h5>
-                            {% if request.user == user %}
-                                <button @click="changeState(movie, $event)" class="btn btn-outline-danger float-right my-3">[[ nowState ]]</button>
-                            {% endif %}
-                            <button class="btn btn-outline-primary float-right" data-toggle="modal" :data-target="makeModal(movie)">더 보기</button>
-                        </div>
-                        
-                        <div class="modal fade" :id="getModal(movie)" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
-                            <div class="modal-dialog" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                    <h5 class="modal-title" id="exampleModalLongTitle">[[ movie.title ]] ([[movie.original_title ]])</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                    </div>
-                                    <img :src="getMoviePoster(movie)" class="card-img-top" alt="...">
-                                    <div class="modal-body">
-                                        <button class='btn btn-outline-success float-right'>[[ movie.vote_average ]]</button><h3>줄거리</h3><p>(개봉일 : [[ movie.release_date ]])</p>
-                                        <p>[[ movie.overview ]]</p>
-                                        <hr>
-                                        <button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Close</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div v-if="isWhere==2" class="col-10 user-page">
-                <h1>{{ user.nickname }}님의 리뷰 목록</h1>
-                <table class="table">
-                    <thead>
-                    <tr class="bg-dark text-white">
-                        <th>번호</th>
-                        <th>영화</th>
-                        <th>점수</th>
-                        <th>등록일</th>
-                    </tr>
-                    </thead>
-                        <tbody>
-                        <tr v-for="review in reviews">
-                            <td>[[ review.id ]]</td>
-                            <td><a :href="getReviewUrl(review)">[[ review_movies[review.movie_id] ]]</a></td>
-                            <td>[[ review.score ]]</td>
-                            <td>[[ makeDate(review.created_at) ]]</td>
-                        </tr>
-                        </tbody>
-                </table>
-
-                <div class="text-center">
-                    <div class="btn btn-group">
-                        <button @click="moveFirst" v-if="curReviewPage != 0" class="btn btn-outline-primary">처음으로</button>
-                        <button @click="movePage" v-if="curReviewPage - 2 > 0" class="btn btn-outline-primary">[[ curReviewPage - 2 ]]</button>
-                        <button @click="movePage" v-if="curReviewPage - 1 > 0" class="btn btn-outline-primary">[[ curReviewPage - 1 ]]</button>
-                        <button @click="movePage" class="btn btn-primary">[[ curReviewPage ]]</button>
-                        <button @click="movePage" v-if="curReviewPage + 1 <= maxReviewPage" class="btn btn-outline-primary">[[ curReviewPage + 1 ]]</button>
-                        <button @click="movePage" v-if="curReviewPage + 2 <= maxReviewPage" class="btn btn-outline-primary">[[ curReviewPage + 2 ]]</button>
-                        <button @click="moveLast" v-if="curReviewPage != maxReviewPage" class="btn btn-outline-primary">마지막으로</button>
-                    </div>
-                </div>
-            </div>
-            <div class="col-2 p-0">
-                <button @click="goHome" class="btn btn-outline-secondary my-2">홈으로</button>
-                <button @click="getMovies" class="btn btn-outline-secondary my-2">좋아요한 영화</button>
-                <button @click="getMovies" class="btn btn-outline-secondary my-2">나중에 볼 영화</button>
-                <button @click="getMovies" class="btn btn-outline-secondary my-2">제외한 영화</button>
-                <button @click="goReview" class="btn btn-outline-secondary my-2">작성한 리뷰</button>
-            </div>
+<div id="app">
+  <div class="row">
+    <div v-if="isWhere==0" class="col-10 user-page">
+      <div class="row">
+        <img class="col-4" src="{{ user.profile_image.url }}">
+        <div class="col-8">
+          <h1>{{ user.username }}({{ user.nickname }})님</h2>
+            {% if request.user == user %}
+              <a class="nav-link text-black" href="{% url 'accounts:update' user.id %}">개인정보 수정하기</a>
+            {% endif %}
+              <h2>선호 장르</h2>
+            {% for genre in user.like_genres.all %}
+              <button class="btn btn-outline-primary m-2">{{ genre }}</button>
+            {% empty %}
+              <h3>등록된 선호 장르가 없습니다!</h3>
+            {% endfor %}
         </div>
-
-        <div class="row">
-        </div>
+      </div>
+      <div class="row mt-4">
+        <h1 class="col-12">장르별 평균 평점</h1>
+        {% for score in genre_score_average %}
+          <div class="col-3 text-center my-2">
+            <button class="btn btn-outline-primary">{{ score.0 }}</button>
+            <h5>{{ score.1 }}점</h5>
+          </div>
+        {% endfor %}
+      </div>
     </div>
+    <div v-if="isWhere==1" class="col-10 user-page">
+      <div class="row">      
+        <h1 v-if="isEmpty">분류된 영화가 없습니다.</h1>
+        <div v-else v-for="movie in movies" class="card col-3" style="width: 18rem;">
+          <img :src="getMoviePoster(movie)" class="card-img-top poster-img" alt="...">
+          <div class="card-body">
+            <h5 class="card-title">[[ movie.title ]]</h5>
+              {% if request.user == user %}
+                <button @click="changeState(movie, $event)" class="btn btn-outline-danger float-right my-3">[[ nowState ]]</button>
+              {% endif %}
+                <button class="btn btn-outline-primary float-right" data-toggle="modal" :data-target="makeModal(movie)">더 보기</button>
+          </div>        
+          <div class="modal fade" :id="getModal(movie)" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLongTitle">[[ movie.title ]] ([[movie.original_title ]])</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <img :src="getMoviePoster(movie)" class="card-img-top" alt="...">
+                <div class="modal-body">
+                  <button class='btn btn-outline-success float-right'>[[ movie.vote_average ]]</button><h3>줄거리</h3><p>(개봉일 : [[ movie.release_date ]])</p>
+                  <p>[[ movie.overview ]]</p>
+                  <hr>
+                  <button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-if="isWhere==2" class="col-10 user-page">
+      <h1>{{ user.nickname }}님의 리뷰 목록</h1>
+      <table class="table">
+        <thead>
+          <tr class="bg-dark text-white">
+            <th>번호</th>
+            <th>영화</th>
+            <th>점수</th>
+            <th>등록일</th>
+          </tr>
+        </thead>
+          <tbody>
+            <tr v-for="review in reviews">
+              <td>[[ review.id ]]</td>
+              <td><a :href="getReviewUrl(review)">[[ review_movies[review.movie_id] ]]</a></td>
+              <td>[[ review.score ]]</td>
+              <td>[[ makeDate(review.created_at) ]]</td>
+            </tr>
+          </tbody>
+        </table>
+
+      <div class="text-center">
+        <div class="btn btn-group">
+          <button @click="moveFirst" v-if="curReviewPage != 0" class="btn btn-outline-primary">처음으로</button>
+          <button @click="movePage" v-if="curReviewPage - 2 > 0" class="btn btn-outline-primary">[[ curReviewPage - 2 ]]</button>
+          <button @click="movePage" v-if="curReviewPage - 1 > 0" class="btn btn-outline-primary">[[ curReviewPage - 1 ]]</button>
+          <button @click="movePage" class="btn btn-primary">[[ curReviewPage ]]</button>
+          <button @click="movePage" v-if="curReviewPage + 1 <= maxReviewPage" class="btn btn-outline-primary">[[ curReviewPage + 1 ]]</button>
+          <button @click="movePage" v-if="curReviewPage + 2 <= maxReviewPage" class="btn btn-outline-primary">[[ curReviewPage + 2 ]]</button>
+          <button @click="moveLast" v-if="curReviewPage != maxReviewPage" class="btn btn-outline-primary">마지막으로</button>
+        </div>
+      </div>
+    </div>
+    <div class="col-2 p-0">
+      <button @click="goHome" class="btn btn-outline-secondary my-2">홈으로</button>
+      <button @click="getMovies" class="btn btn-outline-secondary my-2">좋아요한 영화</button>
+      <button @click="getMovies" class="btn btn-outline-secondary my-2">나중에 볼 영화</button>
+      <button @click="getMovies" class="btn btn-outline-secondary my-2">제외한 영화</button>
+      <button @click="goReview" class="btn btn-outline-secondary my-2">작성한 리뷰</button>
+    </div>
+  </div>
+
+  <div class="row">
+  </div>
+</div>
     
 {% endblock %}
 
 
 {% block vue %}
-
-    <script>
-        const movieKey = ['좋아요한 영화', '나중에 볼 영화', '제외한 영화']
-        const movieKeyDict = {'좋아요한 영화': '좋아요 취소', '나중에 볼 영화': '나중에 보기 취소', '제외한 영화': '다시 보기'}
-        const app = new Vue({
-        delimiters: ['[[', ']]'],
-        el: '#app',
-        data: {
-            userId: "{{ user.id }}",
-            movies: [],
-            movieCount: 0,
-            isWhere: 0,
-            nowState: null,
-            reviews: [],
-            review_movies: [],
-            curReviewPage: 1,
-            maxReviewPage: 0,
-        },
-        methods: {
-            getMovies(event) {
-                axios.get(`/accounts/get_movies/${this.userId}/${movieKey.indexOf(event.target.innerText)}`)
-                    .then(res => {
-                        this.movies = res.data.movies
-                        this.movieCount = res.data.movies.length
-                        this.isWhere = 1
-                        reviews = []
-                        this.nowState = movieKeyDict[event.target.innerText]
-                    })
-                    .catch(err => console.log(err))
-            },
-            goHome() {
-                this.isWhere = 0
-                reviews = []
-            },
-            goReview() {
-                this.isWhere = 2
-                this.getReviews(1)
-            },
-            movePage(event) {
-                let page = parseInt(event.target.innerText)
-                this.curReviewPage = page
-                this.getReviews(page)
-                this.scrollToTop()
-            },
-            moveFirst() {
-                this.curReviewPage = 1
-                this.getReviews(1)
-                this.scrollToTop()
-            },
-            moveLast() {
-                this.curReviewPage = parseInt(this.maxReviewPage)
-                this.getReviews(this.maxReviewPage)
-                this.scrollToTop()
-            },
-            getReviews(page){
-                axios.get(`/accounts/get_reviews/${parseInt(this.userId)}/${page}`)
-                    .then(res => {
-                        this.reviews = res.data.reviews
-                        this.review_movies = res.data.review_movies
-                        this.maxReviewPage = res.data.max_review_page
-                    })
-                    .catch(err => console.log(err))
-            },
-            scrollToTop () {
-            scroll(0, 0)
-            },
-            getMoviePoster(movie) {
-                return `https://image.tmdb.org/t/p/original/${movie.poster_path}`
-            },
-            makeModal(movie) {
-                return `#modal-${movie.id}`
-            },
-            getModal(movie) {
-                return `modal-${movie.id}`
-            },
-            getReviewUrl(review) {
-                return `/movies/review/${review.id}/`
-            },
-            changeState(movie, event) {
-                if (event.target.innerText == "좋아요 취소") {
-                    axios.get(`/movies/movie_like/${movie.id}`)
-                        .then(() => {
-                            this.removeMovie(movie)
-                        })
-                        .catch(err => console.log(err))
-                } else if (event.target.innerText == "나중에 보기 취소") {
-                    axios.get(`/movies/movie_later/${movie.id}`)
-                        .then(() => {
-                            this.removeMovie(movie)
-                        })
-                        .catch(err => console.log(err))
-                } else {
-                    axios.get(`/movies/movie_exclude/${movie.id}`)
-                        .then(() => {
-                            this.removeMovie(movie)
-                        })
-                        .catch(err => console.log(err))
-                }
-            },
-            removeMovie(movie) {
-                let idx = this.movies.indexOf(movie)
-                this.movies.splice(idx, 1)
-            },
-            makeDate(date) {
-                return date.substr(0,10)
-            },
-        },
-        computed: {
-            isEmpty() {
-                if (this.movies.length > 0) {
-                    return false
-                } else {
-                    return true
-                }
-            },
-        },
-        created() {
+  <script>
+    const movieKey = ['좋아요한 영화', '나중에 볼 영화', '제외한 영화']
+    const movieKeyDict = {'좋아요한 영화': '좋아요 취소', '나중에 볼 영화': '나중에 보기 취소', '제외한 영화': '다시 보기'}
+    const app = new Vue({
+    delimiters: ['[[', ']]'],
+    el: '#app',
+    data: {
+      userId: "{{ user.id }}",
+      movies: [],
+      movieCount: 0,
+      isWhere: 0,
+      nowState: null,
+      reviews: [],
+      review_movies: [],
+      curReviewPage: 1,
+      maxReviewPage: 0,
+    },
+    methods: {
+      getMovies(event) {
+        axios.get(`/accounts/get_movies/${this.userId}/${movieKey.indexOf(event.target.innerText)}`)
+          .then(res => {
+            this.movies = res.data.movies
+            this.movieCount = res.data.movies.length
+            this.isWhere = 1
+            reviews = []
+            this.nowState = movieKeyDict[event.target.innerText]
+          })
+          .catch(err => console.log(err))
+      },
+      goHome() {
+        this.isWhere = 0
+        reviews = []
+      },
+      goReview() {
+        this.isWhere = 2
+        this.getReviews(1)
+      },
+      movePage(event) {
+        let page = parseInt(event.target.innerText)
+        this.curReviewPage = page
+        this.getReviews(page)
+        this.scrollToTop()
+      },
+      moveFirst() {
+        this.curReviewPage = 1
+        this.getReviews(1)
+        this.scrollToTop()
+      },
+      moveLast() {
+        this.curReviewPage = parseInt(this.maxReviewPage)
+        this.getReviews(this.maxReviewPage)
+        this.scrollToTop()
+      },
+      getReviews(page){
+        axios.get(`/accounts/get_reviews/${parseInt(this.userId)}/${page}`)
+          .then(res => {
+            this.reviews = res.data.reviews
+            this.review_movies = res.data.review_movies
+            this.maxReviewPage = res.data.max_review_page
+          })
+          .catch(err => console.log(err))
+      },
+      scrollToTop () {
+        scroll(0, 0)
+      },
+      getMoviePoster(movie) {
+        return `https://image.tmdb.org/t/p/original/${movie.poster_path}`
+      },
+      makeModal(movie) {
+        return `#modal-${movie.id}`
+      },
+      getModal(movie) {
+        return `modal-${movie.id}`
+      },
+      getReviewUrl(review) {
+        return `/movies/review/${review.id}/`
+      },
+      changeState(movie, event) {
+        if (event.target.innerText == "좋아요 취소") {
+          axios.get(`/movies/movie_like/${movie.id}`)
+            .then(() => {
+              this.removeMovie(movie)
+            })
+            .catch(err => console.log(err))
+        } else if (event.target.innerText == "나중에 보기 취소") {
+          axios.get(`/movies/movie_later/${movie.id}`)
+            .then(() => {
+              this.removeMovie(movie)
+            })
+            .catch(err => console.log(err))
+        } else {
+          axios.get(`/movies/movie_exclude/${movie.id}`)
+            .then(() => {
+              this.removeMovie(movie)
+            })
+            .catch(err => console.log(err))
         }
-        })
-    </script>
+      },
+      removeMovie(movie) {
+        let idx = this.movies.indexOf(movie)
+        this.movies.splice(idx, 1)
+      },
+      makeDate(date) {
+        return date.substr(0,10)
+      },
+    },
+    computed: {
+      isEmpty() {
+        if (this.movies.length > 0) {
+          return false
+        } else {
+          return true
+        }
+      },
+    },
+    })
+  </script>
 
 {% endblock %}

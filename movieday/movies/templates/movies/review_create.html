@@ -3,40 +3,40 @@
 {% load static %}
 
 {% block css %}
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="{% static 'movies/reviewCreate.css' %}">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="{% static 'movies/reviewCreate.css' %}">
 {% endblock %}
 
 
 {% block content %}
-    {% if request.resolver_match.url_name == 'review_create' %}
-    <div class="w-75 mx-auto">
-        <h1>'{{ movie }}' 리뷰 작성 중</h1>
-        <div class="container">
-            <div class="row">
-                <div class="col-6">
-                    <img src="https://image.tmdb.org/t/p/original/{{ movie.poster_path }}" alt="" class="img-thumbnail">
-                </div>
-                <div class="col-6">
-                    <h3>{{ movie.title }}</h3>
-                    <p>{{ movie.overview }}</p>
-                    <form action="" method="POST">
-                        {% csrf_token %}
-                        {% bootstrap_form form %}
-                        <button class="float-right btn btn-danger">작성 완료</button>
-                    </form>
-                </div>
-            </div>
+  {% if request.resolver_match.url_name == 'review_create' %}
+  <div class="w-75 mx-auto">
+    <h1>'{{ movie }}' 리뷰 작성 중</h1>
+    <div class="container">
+      <div class="row">
+        <div class="col-6">
+          <img src="https://image.tmdb.org/t/p/original/{{ movie.poster_path }}" alt="" class="img-thumbnail">
         </div>
+        <div class="col-6">
+          <h3>{{ movie.title }}</h3>
+          <p>{{ movie.overview }}</p>
+          <form action="" method="POST">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            <button class="float-right btn btn-danger">작성 완료</button>
+          </form>
+        </div>
+      </div>
     </div>
-    {% else %}
-        <div class="w-50 mx-auto">
-            <h1>리뷰 작성</h1>
-            <form action="" method="POST">
-                {% csrf_token %}
-                {% bootstrap_form form %}
-                <button class="float-right btn btn-danger">작성 완료</button>
-            </form>
-        </div>
-    {% endif %}
+  </div>
+  {% else %}
+    <div class="w-50 mx-auto">
+      <h1>리뷰 작성</h1>
+      <form action="" method="POST">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <button class="float-right btn btn-danger">작성 완료</button>
+      </form>
+    </div>
+  {% endif %}
 {% endblock %}

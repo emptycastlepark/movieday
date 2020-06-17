@@ -6,6 +6,6 @@ h1, h2, h5, p, label, span {
   color: rgb(255, 255, 255);
 }
 
-.comment-div {
-  background-color: white;
+hr {
+  background-color: #808080;
 }

@@ -1,93 +1,91 @@
 body {
-    background-color: rgb(0, 0, 0);
+  background-color: rgb(0, 0, 0);
 }
 
 h1 {
-    color: rgb(255, 255, 255);
-    margin: 50px 0;
+  color: rgb(255, 255, 255);
+  margin: 50px 0;
 }
 
 p {
-    margin: 0;
+  margin: 0;
 }
 
 .change-button {
-    color: rgb(255, 255, 255);
-    background: transparent;
-    border: none;
-    font-size: medium;
-    vertical-align: super;
-    float: right;
+  color: rgb(255, 255, 255);
+  background: transparent;
+  border: none;
+  font-size: medium;
+  vertical-align: super;
+  float: right;
 }
 
 table {
-    color: rgb(255, 255, 255);
+  color: rgb(255, 255, 255);
 }
 
 .review-title:hover {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 table {
-    width: 100%;
-    text-align: center;
-    margin: 50px 0;
+  width: 100%;
+  text-align: center;
+  margin: 50px 0;
 }
 
 th {
-    font-size: 20px;
-    padding-bottom: 10px;
+  font-size: 20px;
+  padding-bottom: 10px;
 }
 td {
-    border-top: 2px solid rgb(255, 255, 255);
-    padding: 10px;
+  border-top: 2px solid rgb(255, 255, 255);
+  padding: 10px;
 }
 
-
 th:first-child {
-    width: 30%;
+  width: 30%;
 }
 
 th:nth-child(2) {
-    width: 40%;
+  width: 40%;
 }
 
 th:nth-child(3) {
-    width: 15%;
+  width: 15%;
 }
 
 th:last-child {
-    width: 15%;
+  width: 15%;
 }
 
 td:first-child {
-    color: orange;
+  color: orange;
 }
 
 .review-making-button {
-    color: white;
-    border: 1px solid white;
-    padding: 5px;
-    border-radius: 8px;
-    
+  color: white;
+  border: 1px solid white;
+  padding: 5px;
+  border-radius: 8px;
 }
 
 .review-making-button:hover {
-    text-decoration: none;
-    color: white
+  text-decoration: none;
+  color: white
 }
 
 
 body > div.container > div.d-flex.justify-content-center > ul > li > a,
 body > div.container > div.d-flex.justify-content-center > ul > li > span {
-    background-color: black;
-    color: rgb(255, 255, 255);
-    border: 1px solid white;
+  background-color: black;
+  color: rgb(255, 255, 255);
+  border: 1px solid white;
 }
 
 body > div.container > div.d-flex.justify-content-center > ul > li > a:hover,
 body > div.container > div.d-flex.justify-content-center > ul > li > span:hover {
-    background-color: rgb(128, 128, 128);
-    color: rgb(255, 255, 255);
-    border: 1px solid white;
+  background-color: rgb(128, 128, 128);
+  color: rgb(255, 255, 255);
+  border: 1px solid white;
 }
