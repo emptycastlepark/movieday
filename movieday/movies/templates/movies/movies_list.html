@@ -32,7 +32,7 @@
             </div>
 
             <div class="ml-auto p-2 bd-highlight">
-                <i class="fas fa-search"></i> <input @keyup.enter="searchMovie" type="text" v-model="searchInput">
+                <i class="fas fa-search" style="color: white;"></i> <input @keyup.enter="searchMovie" type="text" v-model="searchInput" class="search-input">
                 <button @click="searchMovie" class="btn btn-outline-light">검색</button>
             </div>
         </div>
@@ -44,8 +44,10 @@
                 <div class="card-body">
                     <h5 class="card-title font-weight-bold">[[ movie.title ]]</h5>
                     <p v-text="getMovieOverview(movie)" class="card-text text-secondary"></p>
-                    <a :href="getReviewUrl(movie)" class="float-left"><button class="btn text-white">리뷰 보기</button></a>
-                    <button @click="getGenres(movie)" type="button" class="btn text-white float-right" data-toggle="modal" :data-target="makeModal(movie)">더보기</button>
+                    <div class="card-bottom">
+                        <a :href="getReviewUrl(movie)" class="float-left"><button class="btn text-white">리뷰 보기</button></a>
+                        <button @click="getInfo(movie)" type="button" class="btn text-white float-right" data-toggle="modal" :data-target="makeModal(movie)">더보기</button>
+                    </div>
                 </div>
 
                 <div class="modal fade bd-example-modal-xl" :id="getModal(movie)" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
@@ -65,19 +67,18 @@
                                             <button class='btn btn-outline-success float-right'>[[ movie.vote_average ]]</button>
                                             <p>개봉일 : [[ movie.release_date ]]</p>
                                             <hr>
-                                            <button v-for="genre in temp_genres" type="button" class="btn btn-outline-secondary animated infinite swing delay-1s slow mx-3">[[ genre ]]</button>
+                                            <button v-for="genre in temp_genres" type="button" class="btn btn-outline-secondary mx-2 my-2">[[ genre ]]</button>
                                             <hr>
                                             <p class="text-left">[[ movie.overview ]]</p>
                                         </div>
                                         <div class="col-4">
-                                            <i v-if="checkLike(movie)" @click="changeLike(movie, $event)" class="far fa-heart" style="color:red;" data-dismiss="modal">취소</i>
-                                            <i v-else class="fas fa-heart" @click="changeLike(movie, $event)" style="color:black;">좋아요</i>
+                                            <div class="row">
+                                                <i @click="changeLike(movie, $event)" class="far fa-heart col-4" style="color:red;" data-dismiss="modal">[[ stateLike ]]</i>
 
-                                            <i v-if="checkExclude(movie)" @click="changeExclude(movie, $event)" class="far fa-dizzy" style="color:green;" data-dismiss="modal">취소</i>
-                                            <i v-else type="button" @click="changeExclude(movie, $event)" class="far fa-dizzy" style="color:black;" data-dismiss="modal">안 볼래요</i>
-                                    
-                                            <i v-if="checkLater(movie)" @click="changeLater(movie, $event)"  class="far fa-grin-alt" style="color:blue;" data-dismiss="modal">취소</i>
-                                            <i v-else type="button" @click="changeLater(movie, $event)" class="far fa-grin-alt" style="color:black;" data-dismiss="modal">나중에 볼래요//</i>        
+                                                <i @click="changeExclude(movie, $event)" class="fas fa-times col-4" style="color:green;" data-dismiss="modal">[[ stateExclude ]]</i>
+                                        
+                                                <i @click="changeLater(movie, $event)"  class="fas fa-plus-square col-4 p-0" style="color:blue;" data-dismiss="modal">[[ stateLater ]]</i>     
+                                            </div>  
                                             <hr>
                                             <p> 최근 5개의 리뷰만 표시됩니다. <a :href="getReviewUrl(movie)"><button class="btn btn-outline-info">전체 리뷰 보기</button></a></p>
                                             <ul class="text-left">
@@ -85,20 +86,22 @@
                                                 <li v-else v-for="review in reviews">[[ review ]]</li>
                                             </ul>
                                             <div class="input-group mb-3 row">
-                                                <select class="form-control col-2" id="exampleFormControlSelect1" v-model="reviewScore">
-                                                    <option>0</option>
-                                                    <option>1</option>
-                                                    <option>2</option>
-                                                    <option>3</option>
-                                                    <option>4</option>
-                                                    <option>5</option>
-                                                    <option>6</option>
-                                                    <option>7</option>
-                                                    <option>8</option>
-                                                    <option>9</option>
-                                                    <option>10</option>
-                                                </select>
-                                                <div class="col-10 px-0">
+                                                <div class="col-4">
+                                                    <select class="form-control" id="exampleFormControlSelect1" v-model="reviewScore">
+                                                        <option>0</option>
+                                                        <option>1</option>
+                                                        <option>2</option>
+                                                        <option>3</option>
+                                                        <option>4</option>
+                                                        <option>5</option>
+                                                        <option>6</option>
+                                                        <option>7</option>
+                                                        <option>8</option>
+                                                        <option>9</option>
+                                                        <option>10</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-8 px-0">
                                                     <div class="row">
                                                         <input v-model="reviewInput" type="text" class="form-control col-9" placeholder="간단 리뷰 작성하기" aria-label="Recipient's username" aria-describedby="button-addon">
                                                         <div class="px-0 input-group-append col-3">
@@ -120,26 +123,26 @@
 
         <div v-if="!isSearching">
             <div class="btn btn-group">
-                <button @click="moveFirst" v-if="curPageNumber != 0" class="btn btn-outline-primary">처음으로</button>
-                <button @click="movePage" v-if="curPageNumber - 1 > 0" class="btn btn-outline-primary">[[ curPageNumber - 1 ]]</button>
-                <button @click="movePage" v-if="curPageNumber > 0" class="btn btn-outline-primary">[[ curPageNumber ]]</button>
-                <button @click="movePage" class="btn btn-primary">[[ curPageNumber + 1 ]]</button>
-                <button @click="movePage" v-if="curPageNumber < maxPageNumber" class="btn btn-outline-primary">[[ curPageNumber + 2 ]]</button>
-                <button @click="movePage" v-if="curPageNumber + 1 < maxPageNumber" class="btn btn-outline-primary">[[ curPageNumber + 3 ]]</button>
-                <button @click="moveLast" v-if="curPageNumber != maxPageNumber" class="btn btn-outline-primary">마지막으로</button>
+                <button @click="moveFirst" v-if="curPageNumber != 0">처음으로</button>
+                <button @click="movePage" v-if="curPageNumber - 1 > 0">[[ curPageNumber - 1 ]]</button>
+                <button @click="movePage" v-if="curPageNumber > 0">[[ curPageNumber ]]</button>
+                <button @click="movePage">[[ curPageNumber + 1 ]]</button>
+                <button @click="movePage" v-if="curPageNumber < maxPageNumber">[[ curPageNumber + 2 ]]</button>
+                <button @click="movePage" v-if="curPageNumber + 1 < maxPageNumber">[[ curPageNumber + 3 ]]</button>
+                <button @click="moveLast" v-if="curPageNumber != maxPageNumber">마지막으로</button>
             </div>
         </div>
 
         
         <div v-else>
             <div class="btn btn-group">
-                <button @click="moveSearchingPage" v-if="curPageNumber != 0" class="btn btn-outline-primary">1</button>
-                <button @click="moveSearchingPage" v-if="curPageNumber - 1 > 0" class="btn btn-outline-primary">[[ curPageNumber - 1 ]]</button>
-                <button @click="moveSearchingPage" v-if="curPageNumber > 0" class="btn btn-outline-primary">[[ curPageNumber ]]</button>
-                <button @click="moveSearchingPage" class="btn btn-primary">[[ curPageNumber + 1 ]]</button>
-                <button @click="moveSearchingPage" v-if="curPageNumber < maxPageNumber" class="btn btn-outline-primary">[[ curPageNumber + 2 ]]</button>
-                <button @click="moveSearchingPage" v-if="curPageNumber + 1 < maxPageNumber" class="btn btn-outline-primary">[[ curPageNumber + 3 ]]</button>
-                <button @click="moveSearchingPage" v-if="curPageNumber != maxPageNumber" class="btn btn-outline-primary">[[ maxPageNumber + 1 ]]</button>
+                <button @click="moveSearchingPage" v-if="curPageNumber != 0">1</button>
+                <button @click="moveSearchingPage" v-if="curPageNumber - 1 > 0">[[ curPageNumber - 1 ]]</button>
+                <button @click="moveSearchingPage" v-if="curPageNumber > 0">[[ curPageNumber ]]</button>
+                <button @click="moveSearchingPage">[[ curPageNumber + 1 ]]</button>
+                <button @click="moveSearchingPage" v-if="curPageNumber < maxPageNumber">[[ curPageNumber + 2 ]]</button>
+                <button @click="moveSearchingPage" v-if="curPageNumber + 1 < maxPageNumber">[[ curPageNumber + 3 ]]</button>
+                <button @click="moveSearchingPage" v-if="curPageNumber != maxPageNumber">[[ maxPageNumber + 1 ]]</button>
             </div>
         </div>
     </div>
@@ -175,6 +178,7 @@
             searchInput: null,
             realSearching: null,
             isSearching: false,
+            movieInfo: [null, null, null],
         },
         methods: {
             getMovies(pageNumber, key, genre) {
@@ -267,6 +271,26 @@
                     })
                     .catch(err => console.log(err))
             },
+            getInfo(movie) {
+                let movieInfo = []
+                if (this.checkLike(movie)) {
+                    movieInfo.push('취소')
+                } else {
+                    movieInfo.push('좋아요')
+                }
+                if (this.checkExclude(movie)) {
+                    movieInfo.push('취소')
+                } else {
+                    movieInfo.push('제외 하기')
+                }
+                if (this.checkLater(movie)) {
+                    movieInfo.push('취소')
+                } else {
+                    movieInfo.push('목록에 추가')
+                }
+                this.movieInfo = movieInfo
+                this.getGenres(movie) 
+            },
             getReviews(movie) {
                 axios.get(`/movies/get_reviews/${movie.id}`)
                     .then(response => {
@@ -308,13 +332,10 @@
                         console.log(res.data)
                         let like_count = res.data.like_count
                         let liked = res.data.liked
-                        console.log(liked, like_count)
                         if (liked) {
-                            event.target.innerText = '취소'
-                            event.target.style.color = 'red'
+                            this.like_movies.push(movie.id)
                         } else {
-                            event.target.innerText = '좋아요'
-                            event.target.style.color = 'black'
+                            this.like_movies.splice(this.like_movies.indexOf(movie.id), 1)
                         }
                     })
                   .catch(err => console.log(err))
@@ -324,11 +345,9 @@
                     .then( res => {
                         let exclude = res.data.exclude
                         if (exclude) {
-                            event.target.innerText = '취소'
-                            event.target.style.color = 'green'
+                            this.exclude_movies.push(movie.id)
                         } else {
-                            event.target.innerText = '안 볼래요'
-                            event.target.style.color = 'black'
+                            this.exclude_movies.splice(this.exclude_movies.indexOf(movie.id), 1)
                         }
                         })
                     .catch(error=> {console.log(error)})
@@ -338,11 +357,9 @@
                     .then( res => {
                         let later = res.data.later
                     if (later) {
-                        event.target.innerText = '취소'
-                        event.target.style.color = 'blue'
+                        this.later_movies.push(movie.id)
                     } else {
-                        event.target.innerText = '나중에 볼래요'
-                        event.target.style.color = 'black'
+                        this.later_movies.splice(this.later_movies.indexOf(movie.id), 1)
                     }
                     })
                     .catch(error=> {console.log(error)})
@@ -358,7 +375,16 @@
                 } else {
                     return true
                 }
-            }
+            },
+            stateLike(movie) {
+                return this.movieInfo[0]
+            },
+            stateExclude(movie) {
+                return this.movieInfo[1]
+            },
+            stateLater(movie) {
+                return this.movieInfo[2]
+            },
         },
         created() {
             this.getMovies(0, 0, 0)

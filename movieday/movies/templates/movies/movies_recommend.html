@@ -64,12 +64,11 @@
                 </div>
                 <img src="https://image.tmdb.org/t/p/original/{{ movie.poster_path }}" class="card-img-top" alt="...">
                 <div class="modal-body">
-                  <button class='btn btn-outline-success float-right'>{{ movie.vote_average }}</button>
-                  <p>개봉일 : {{ movie.release_date }}</p>
-                  <hr>
-                  <h3>줄거리</h3>
+                  <button class='btn btn-outline-success float-right'>{{ movie.vote_average }}</button><h3>줄거리</h3><p>(개봉일 : {{ movie.release_date }})</p>
                   <p>{{ movie.overview }}</p>
-                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  <hr>
+                  <button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Close</button>
+                  <a href="{% url 'movies:review_list_movie' movie.id %}"><button type="button" class="btn btn-outline-info">리뷰 보러 가기</button></a>
                 </div>
               </div>
           </div>
@@ -125,12 +124,11 @@
                 </div>
                 <img src="https://image.tmdb.org/t/p/original/{{ movie.poster_path }}" class="card-img-top" alt="...">
                 <div class="modal-body">
-                  <button class='btn btn-outline-success float-right'>{{ movie.vote_average }}</button>
-                  <p>개봉일 : {{ movie.release_date }}</p>
-                  <hr>
-                  <h3>줄거리</h3>
+                  <button class='btn btn-outline-success float-right'>{{ movie.vote_average }}</button><h3>줄거리</h3><p>(개봉일 : {{ movie.release_date }})</p>
                   <p>{{ movie.overview }}</p>
-                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  <hr>
+                  <button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Close</button>
+                  <a href="{% url 'movies:review_list_movie' movie.id %}"><button type="button" class="btn btn-outline-info">리뷰 보러 가기</button></a>
                 </div>
               </div>
           </div>
@@ -194,12 +192,11 @@
               </div>
               <img :src="getPosterUrl(movie)" class="card-img-top" alt="...">
               <div class="modal-body">
-                <button class='btn btn-outline-success float-right'>[[ movie.vote_average ]]</button>
-                <p>개봉일 : [[ movie.release_date ]]</p>
-                <hr>
-                <h3>줄거리</h3>
+                <button class='btn btn-outline-success float-right'>[[ movie.vote_average ]]</button><h3>줄거리</h3><p>(개봉일 : [[ movie.release_date ]])</p>
                 <p>[[ movie.overview ]]</p>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <hr>
+                <button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Close</button>
+                <a :href="getMovieReviewUrl(movie)"><button type="button" class="btn btn-outline-info">리뷰 보러 가기</button></a>
               </div>
             </div>
           </div>
@@ -215,12 +212,11 @@
               </div>
               <img :src="getPosterUrl(movie)" class="card-img-top" alt="...">
               <div class="modal-body">
-                <button class='btn btn-outline-success float-right'>[[ movie.vote_average ]]</button>
-                <p>개봉일 : [[ movie.release_date ]]</p>
-                <hr>
-                <h3>줄거리</h3>
+                <button class='btn btn-outline-success float-right'>[[ movie.vote_average ]]</button><h3>줄거리</h3><p>(개봉일 : [[ movie.release_date ]])</p>
                 <p>[[ movie.overview ]]</p>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <hr>
+                <button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Close</button>
+                <a :href="getMovieReviewUrl(movie)"><button type="button" class="btn btn-outline-info">리뷰 보러 가기</button></a>
               </div>
             </div>
           </div>
@@ -236,12 +232,11 @@
               </div>
               <img :src="getPosterUrl(movie)" class="card-img-top" alt="...">
               <div class="modal-body">
-                <button class='btn btn-outline-success float-right'>[[ movie.vote_average ]]</button>
-                <p>개봉일 : [[ movie.release_date ]]</p>
-                <hr>
-                <h3>줄거리</h3>
+                <button class='btn btn-outline-success float-right'>[[ movie.vote_average ]]</button><h3>줄거리</h3><p>(개봉일 : [[ movie.release_date ]])</p>
                 <p>[[ movie.overview ]]</p>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <hr>
+                <button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Close</button>
+                <a :href="getMovieReviewUrl(movie)"><button type="button" class="btn btn-outline-info">리뷰 보러 가기</button></a>
               </div>
             </div>
           </div>
@@ -361,6 +356,9 @@
         } else {
           return false
         }
+      },
+      getMovieReviewUrl(movie) {
+        return `/movies/review_list_movie/${movie.id}/`
       }
     },
     created() {

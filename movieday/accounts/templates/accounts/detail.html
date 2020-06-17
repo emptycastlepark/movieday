@@ -41,31 +41,31 @@
                     
                     <h1 v-if="isEmpty">분류된 영화가 없습니다.</h1>
                     <div v-else v-for="movie in movies" class="card col-3" style="width: 18rem;">
-                        <img :src="getMoviePoster(movie)" class="card-img-top" alt="...">
+                        <img :src="getMoviePoster(movie)" class="card-img-top poster-img" alt="...">
                         <div class="card-body">
                             <h5 class="card-title">[[ movie.title ]]</h5>
                             {% if request.user == user %}
-                                <button @click="changeState(movie, $event)" class="btn btn-outline-danger">[[ nowState ]]</button>
+                                <button @click="changeState(movie, $event)" class="btn btn-outline-danger float-right my-3">[[ nowState ]]</button>
                             {% endif %}
-                            <button class="btn btn-outline-primary" data-toggle="modal" :data-target="makeModal(movie)">더 보기</button>
+                            <button class="btn btn-outline-primary float-right" data-toggle="modal" :data-target="makeModal(movie)">더 보기</button>
                         </div>
                         
-                        <div class="modal fade" :id="getModal(movie)" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                            <div class="modal-dialog">
+                        <div class="modal fade" :id="getModal(movie)" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
                                 <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="exampleModalLabel">[[ movie.title ]]</h5>
+                                    <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLongTitle">[[ movie.title ]] ([[movie.original_title ]])</h5>
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
+                                        <span aria-hidden="true">&times;</span>
                                     </button>
-                                </div>
-                                <div class="modal-body">
-                                    <img :src="getMoviePosterBack(movie)" class="card-img-top" alt="...">
-                                    <p>[[ movie.overview ]]</p>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                </div>
+                                    </div>
+                                    <img :src="getMoviePoster(movie)" class="card-img-top" alt="...">
+                                    <div class="modal-body">
+                                        <button class='btn btn-outline-success float-right'>[[ movie.vote_average ]]</button><h3>줄거리</h3><p>(개봉일 : [[ movie.release_date ]])</p>
+                                        <p>[[ movie.overview ]]</p>
+                                        <hr>
+                                        <button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Close</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -190,9 +190,6 @@
             },
             getMoviePoster(movie) {
                 return `https://image.tmdb.org/t/p/original/${movie.poster_path}`
-            },
-            getMoviePosterBack(movie) {
-                return `https://image.tmdb.org/t/p/original/${movie.backdrop_path}`
             },
             makeModal(movie) {
                 return `#modal-${movie.id}`

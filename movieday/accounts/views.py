@@ -18,7 +18,7 @@ def signup(request):
         form = CustomUserCreationForm(request.POST, request.FILES)
         if form.is_valid():
             user = form.save()
-            auth_login(request, user)
+            auth_login(request, user, backend="django.contrib.auth.backends.ModelBackend")
             return redirect('movies:movie_list')
     else:
         form = CustomUserCreationForm()
