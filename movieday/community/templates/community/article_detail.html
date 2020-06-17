@@ -8,36 +8,40 @@
 {% endblock %}
 
 {% block content %}
-    <div class="w-50 mx-auto">
-        <h3>제목: {{ article.title }}</h3>
-        <h1>내용: {{ article.content }}</h1>
-        <hr>
+    <div class="w-75 mx-auto">
+        <div class="float-right">
+            <p class="my-0">작성일자: {{ article.created_at }}</p>
+            <p class="my-0">수정일자: {{ article.updated_at }}</p>
+        </div>
+        <h1>제목: {{ article.title }}</h1>
         <h5>작성자: {{article.author }}</h5>
-        <h5>작성일자: {{ article.created_at }}</h5>
-        <h5>수정일자: {{ article.updated_at }}</h5>
+        <hr>
+        <h2>내용: {{ article.content }}</h2>
         <hr>
         <p class="text-white">
-        추천 <span id="like-count-{{ article.pk }}">{{ article.like_users.all|length }}</span>
-        </p>
-        {% if request.user != article.author %}
-          {% if user in article.like_users.all %}
-            <i data-id="{{ article.pk }}" class="far fa-thumbs-up fa-lg like-button" style="color:red; cursor: pointer;"></i>
+          {% if request.user != article.author %}
+            {% if user in article.like_users.all %}
+              <i data-id="{{ article.pk }}" class="far fa-thumbs-up fa-lg like-button" style="color:red; cursor: pointer;"></i>
+            {% else %}
+              <i data-id="{{ article.pk }}" class="far fa-thumbs-up fa-lg like-button" style="color:white; cursor: pointer;"></i>
+            {% endif %}
           {% else %}
-            <i data-id="{{ article.pk }}" class="far fa-thumbs-up fa-lg like-button" style="color:white; cursor: pointer;"></i>
-          {% endif %}
-        {% else %}
-            <div class="d-flex flex-row-reverse bd-highlight">
-                <div class="p-2 bd-highlight">
-                    <form action="{% url 'community:article_delete' article.pk %}" method='POST'>
-                        {% csrf_token %}
-                        <button class="btn btn-danger">글 삭제</button>
-                    </form>
-                </div>
-                <div class="p-2 bd-highlight">
-                    <a href="{% url 'community:article_update' article.pk %}"><button class="btn btn-danger">글 수정</button></a>
+            <div class="float-right">
+                <div class="d-flex flex-row-reverse bd-highlight">
+                    <div class="p-2 bd-highlight">
+                        <form action="{% url 'community:article_delete' article.pk %}" method='POST'>
+                            {% csrf_token %}
+                            <button class="btn btn-danger">글 삭제</button>
+                        </form>
+                    </div>
+                    <div class="p-2 bd-highlight">
+                        <a href="{% url 'community:article_update' article.pk %}"><button class="btn btn-danger">글 수정</button></a>
+                    </div>
                 </div>
             </div>
-        {% endif %}
+          {% endif %}
+        <span id="like-count-{{ article.pk }}">추천 {{ article.like_users.all|length }}</span>
+        </p>
         <hr>
         <div class="">
             <form action="{% url 'community:comment_create' article.pk %}" method='POST'>
@@ -47,16 +51,19 @@
             </form>
         </div>
         <br>
-        <h5 class="text-secondary font-weight-bold">댓글보기</h5>
+        <h5 class="text-secondary font-weight-bold mt-5">댓글보기</h5>
         {% for comment in article.comment_set.all %}
-          <h5>{{ comment.content }}</h5>
-          <p class="text-secondary">{{ comment.author }}</p>
           {% if request.user == comment.author %}
-            <form action="{% url 'community:comment_delete' article.pk comment.pk %}" method='POST'>
-              {% csrf_token %}
-              <button class="btn btn-outline-secondary float-md-right">삭제하기</button>
-            </form>
+            <hr class="comment-div">
+            <div class="float-right">
+              <form action="{% url 'community:comment_delete' article.pk comment.pk %}" method='POST'>
+                {% csrf_token %}
+                <button class="btn btn-outline-light float-md-right">삭제하기</button>
+              </form>
+            </div>
           {% endif %}
+          <p class="text-secondary">{{ comment.author }}</p>
+          <h5>{{ comment.content }}</h5>
         {% endfor %}
     </div>
   <script>

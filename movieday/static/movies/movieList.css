@@ -38,8 +38,6 @@ body {
     border-bottom-right-radius: 10px;
 }
 
-<<<<<<< HEAD
-
 .search-input {
     background: transparent;
     color: white;
@@ -49,7 +47,8 @@ body {
 
 .search-input:focus {
     outline: none;
-=======
+}
+
 body > div.container > div.d-flex.justify-content-center > ul > li > a,
 body > div.container > div.d-flex.justify-content-center > ul > li > span {
     background-color: black;
@@ -64,5 +63,4 @@ body > div.container > div.d-flex.justify-content-center > ul > li > span:focus 
     background-color: rgb(128, 128, 128);
     color: rgb(255, 255, 255);
     border: 1px solid white;
->>>>>>> 3fc258d5e7a4225b11ab7fb62acda08bc2919c0b
 }
