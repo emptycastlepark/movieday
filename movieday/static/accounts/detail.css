@@ -10,22 +10,30 @@ table {
     text-align: center;;
 }
 
+thead {
+    color: white;
+}
+
 th:first-child {
-    color: red;
     width: 15%;
 }
 
 th:nth-child(2) {
-    color: blue;
     width: 40%;
 }
 
 th:nth-child(3) {
-    color: yellow;
     width: 15%;
 }
 
 th:last-child {
-    color: orange;
     width: 30%;
+}
+
+.poster-img {
+    height: 300px;
+}
+
+.card-title {
+    height: 48px;
 }

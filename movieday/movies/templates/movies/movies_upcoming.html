@@ -13,7 +13,7 @@
     <div id="app">
         <div v-if="isList">
             <div class="d-flex justify-content-between">
-                <h1>상영 예정 영화 (총 [[ countMovies ]]개)</h1><button @click="changeComponent" class="btn btn-second">월 별로 보기</button>
+                <h1>상영 예정 영화 (총 [[ countMovies ]]개)</h1><p @click="changeComponent" class="change-button">월 별로 보기</p>
             </div>
             
             <div class="row">
@@ -23,7 +23,7 @@
                         <h5 class="card-title">[[ upcomingMovie.title ]]</h5>
                         <p v-if="hasOverView(upcomingMovie)" class="card-text">[[ getOverView(upcomingMovie) ]]</p>
                         <p v-else class="card-text">입력된 줄거리가 없습니다.</p>
-                        <button type="button" class="btn btn-primary float-right" data-toggle="modal" :data-target="makeModalId(upcomingMovie)">더보기</button>
+                        <p class="modal-button float-right" data-toggle="modal" :data-target="makeModalId(upcomingMovie)">더보기</p>
                     </div>
                 </div>
             </div>
@@ -37,22 +37,23 @@
 
         <div v-else>
             <div class="d-flex justify-content-between">
-                <h1>상영 예정 영화 (총 [[ countMovies ]]개)</h1><button @click="changeComponent" class="btn btn-second">리스트로 보기</button>
+                <h1>상영 예정 영화 (총 [[ countMovies ]]개)</h1><p @click="changeComponent" class="change-button">리스트로 보기</p>
             </div>
 
             <div class="row">
-                <button v-if="!isFirstMonth" @click="movePrev" id="prev" class="btn btn-outline-second col-2"><</button>
+                <button v-if="!isFirstMonth" @click="movePrev" id="prev" class="btn btn-outline-light col-2"><</button>
                 <div v-else class="col-2"></div>
                 <h3 id="current-year-month" class="col-8 text-center">[[ year ]]년 [[ month+1 ]]월</h3>
-                <button v-if="!isLastMonth" @click="moveNext" id="next" class="btn btn-outline-second col-2">></button>
+                <button v-if="!isLastMonth" @click="moveNext" id="next" class="btn btn-outline-light col-2">></button>
                 <div v-else class="col-2"></div>
                 
                 <div v-for="upcomingMovie in upcomingMonth" class="card col-3" style="width: 18rem;">
-                    <img :src="getPosterUrl(upcomingMovie)" class="card-img-top">
+                    <img :src="getPosterUrl(upcomingMovie)" class="card-img-top poster-img">
                     <div class="card-body">
                         <h5 class="card-title">[[ upcomingMovie.title ]]</h5>
-                        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                        <button type="button" class="btn btn-primary float-right" data-toggle="modal" :data-target="makeModalId(upcomingMovie)">더보기</button>
+                        <p v-if="hasOverView(upcomingMovie)" class="card-text">[[ getOverView(upcomingMovie) ]]</p>
+                        <p v-else class="card-text">입력된 줄거리가 없습니다.</p>
+                        <p class="modal-button float-right" data-toggle="modal" :data-target="makeModalId(upcomingMovie)">더보기</p>
                     </div>
                 </div>
 
@@ -75,8 +76,9 @@
                     <p>개봉일 : [[ upcomingMovie.release_date ]]</p>
                     <hr>
                     <h3>줄거리</h3>
-                    <p>[[ upcomingMovie.overview ]]</p>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <p v-if="hasOverView(upcomingMovie)">[[ upcomingMovie.overview ]]</p>
+                    <p v-else>입력된 줄거리가 없습니다.</p>
+                    <button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Close</button>
                 </div>
                 </div>
             </div>
