@@ -1,44 +1,44 @@
 <div class="modal fade" id="modal-{{ movie.pk }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLongTitle">{{ movie.title }} ({{movie.original_title }})</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-            </div>
-            <img src="https://image.tmdb.org/t/p/original/{{ movie.poster_path }}" class="card-img-top" alt="...">
-            <div class="modal-body">
-            <button class='btn btn-outline-success float-right'>{{ movie.vote_average }}</button>
-            <p>개봉일 : {{ movie.release_date }}</p>
-            <hr>
-            {% if user in movie.like_users.all %}
-                <i data-id="{{movie.pk}}" class="fas fa-heart" style="color:red;" data-dismiss="modal">좋아요 취소</i>
-            {% else %}
-                <i data-id="{{movie.pk}}" class="fas fa-heart" style="color:black;">좋아요</i>
-            {% endif %}
-            <p><span id="like-count-{{movie.pk}}">{{ movie.like_users.all|length }}</span>명이 좋아합니다!</p>
-            <h3>줄거리</h3>
-            <p>{{ movie.overview }}</p>
-            {% for genre in movie.genres.all %}
-                <button type="button" class="btn btn-outline-secondary animated infinite swing delay-1s slow">{{ genre.name }}</button>
-            {% endfor %}
-            </div>
-            <div class="modal-footer">
-    
-            {% if user in movie.exclude_users.all %}
-                <button data-id="{{movie.pk}}" type="button" class="btn btn-danger exclude-buttons" data-dismiss="modal">실행 취소</button>
-            {% else %}
-                <button data-id="{{movie.pk}}" type="button" class="btn btn-danger exclude-buttons">안 볼거야!</button>
-            {% endif %}
-    
-            {% if user in movie.later_users.all %}
-                <button data-id="{{movie.pk}}" type="button" class="btn btn-info later-buttons" data-dismiss="modal">안 볼래용</button>
-            {% else %}
-                <button data-id="{{movie.pk}}" type="button" class="btn btn-info later-buttons">나중에 볼게요//</button>
-            {% endif %}
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </div>
-        </div>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+      <h5 class="modal-title" id="exampleModalLongTitle">{{ movie.title }} ({{movie.original_title }})</h5>
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      </div>
+      <img src="https://image.tmdb.org/t/p/original/{{ movie.poster_path }}" class="card-img-top" alt="...">
+      <div class="modal-body">
+      <button class='btn btn-outline-success float-right'>{{ movie.vote_average }}</button>
+      <p>개봉일 : {{ movie.release_date }}</p>
+      <hr>
+      {% if user in movie.like_users.all %}
+        <i data-id="{{movie.pk}}" class="fas fa-heart" style="color:red;" data-dismiss="modal">좋아요 취소</i>
+      {% else %}
+        <i data-id="{{movie.pk}}" class="fas fa-heart" style="color:black;">좋아요</i>
+      {% endif %}
+      <p><span id="like-count-{{movie.pk}}">{{ movie.like_users.all|length }}</span>명이 좋아합니다!</p>
+      <h3>줄거리</h3>
+      <p>{{ movie.overview }}</p>
+      {% for genre in movie.genres.all %}
+        <button type="button" class="btn btn-outline-secondary animated infinite swing delay-1s slow">{{ genre.name }}</button>
+      {% endfor %}
+      </div>
+      <div class="modal-footer">
+
+      {% if user in movie.exclude_users.all %}
+        <button data-id="{{movie.pk}}" type="button" class="btn btn-danger exclude-buttons" data-dismiss="modal">실행 취소</button>
+      {% else %}
+        <button data-id="{{movie.pk}}" type="button" class="btn btn-danger exclude-buttons">안 볼거야!</button>
+      {% endif %}
+
+      {% if user in movie.later_users.all %}
+        <button data-id="{{movie.pk}}" type="button" class="btn btn-info later-buttons" data-dismiss="modal">안 볼래용</button>
+      {% else %}
+        <button data-id="{{movie.pk}}" type="button" class="btn btn-info later-buttons">나중에 볼게요//</button>
+      {% endif %}
+      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
     </div>
+  </div>
 </div>

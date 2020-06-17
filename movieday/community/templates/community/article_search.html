@@ -3,36 +3,36 @@
 {% load static %}
 
 {% block css %}
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="{% static 'community/articleSearch.css' %}">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="{% static 'community/articleSearch.css' %}">
 {% endblock %}
 
 {% block content %}
   <h1>'{{kw}}' 검색 결과</h1>
   {% if not page_obj %}
-  <h4>검색 결과가 없습니다.</h4>
+    <h4>검색 결과가 없습니다.</h4>
   {% else %}
-  <h4>총 {{ search_result.all|length }}개의 글이 검색되었습니다.</h4>
+    <h4>총 {{ search_result.all|length }}개의 글이 검색되었습니다.</h4>
   <table class="table">
     <thead>
-    <tr class="bg-dark text-white">
+      <tr class="bg-dark text-white">
         <th>번호</th>
         <th>제목</th>
         <th>글쓴이</th>
         <th>등록일</th>
         <th>추천</th>
-    </tr>
+      </tr>
     </thead>
     {% for article in page_obj %}
-        <tbody>
+      <tbody>
         <tr>
-            <td>{{ article.pk }}</td>
-            <td><a class="text-white font-weight-bold" href ="{% url 'community:article_detail' article.pk %}">{{ article.title }}</a></td>
-            <td>{{ article.author }}</td>
-            <td>{{ article.created_at|date:"m-d" }}</td>
-            <td>{{ article.like_users.all|length }}</td>
+          <td>{{ article.pk }}</td>
+          <td><a class="text-white font-weight-bold" href ="{% url 'community:article_detail' article.pk %}">{{ article.title }}</a></td>
+          <td>{{ article.author }}</td>
+          <td>{{ article.created_at|date:"m-d" }}</td>
+          <td>{{ article.like_users.all|length }}</td>
         </tr>
-        </tbody>
+      </tbody>
     {% endfor %}
   </table>
   {% endif %}

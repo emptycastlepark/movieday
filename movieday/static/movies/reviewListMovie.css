@@ -12,14 +12,14 @@ h1 {
 
 body > div.container > div.d-flex.justify-content-center > ul > li > a,
 body > div.container > div.d-flex.justify-content-center > ul > li > span {
-    background-color: black;
-    color: rgb(255, 255, 255);
-    border: 1px solid white;
+  background-color: black;
+  color: rgb(255, 255, 255);
+  border: 1px solid white;
 }
 
 body > div.container > div.d-flex.justify-content-center > ul > li > a:hover,
 body > div.container > div.d-flex.justify-content-center > ul > li > span:hover {
-    background-color: rgb(128, 128, 128);
-    color: rgb(255, 255, 255);
-    border: 1px solid white;
+  background-color: rgb(128, 128, 128);
+  color: rgb(255, 255, 255);
+  border: 1px solid white;
 }

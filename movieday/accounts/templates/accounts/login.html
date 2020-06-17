@@ -4,26 +4,20 @@
 {% load socialaccount %}
 
 {% block css %}
-    <style>
-        body {
-            background-color: rgb(0, 0, 0);
-        }
-        label {
-            color: white;
-        }
-    </style>
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="{% static 'accounts/login.css' %}">
 {% endblock %}
 
 {% block content%}
-    <div class="w-25 mx-auto">
-        <h1 class="font-weight-bold text-white">로그인</h1>
-        <form action="", method="POST">
-            {% csrf_token %}
-            {% bootstrap_form form %}
-            <button class="btn btn-danger w-100 text-white">로그인</button>
-        </form>
-        <a href="{% provider_login_url 'google' %}"><button class="btn btn-outline-light w-100 my-2">GOOGLE LOGIN</button></a>
-        <p class="text-secondary d-inline-block">회원이 아닌가요?</p>
-        <a class="text-white font-weight-bold" href="{% url 'accounts:signup' %}"> 지금 가입하세요.</a>
-    </div>
+  <div class="w-25 mx-auto">
+    <h1 class="font-weight-bold text-white">로그인</h1>
+    <form action="", method="POST">
+      {% csrf_token %}
+      {% bootstrap_form form %}
+      <button class="btn btn-danger w-100 text-white">로그인</button>
+    </form>
+    <a href="{% provider_login_url 'google' %}"><button class="btn btn-outline-light w-100 my-2">GOOGLE LOGIN</button></a>
+    <p class="text-secondary d-inline-block">회원이 아닌가요?</p>
+    <a class="text-white font-weight-bold" href="{% url 'accounts:signup' %}"> 지금 가입하세요.</a>
+  </div>
 {% endblock %}

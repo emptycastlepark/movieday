@@ -3,38 +3,38 @@
 {% load static %}
 
 {% block css %}
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="{% static 'movies/reviewListMovie.css' %}">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="{% static 'movies/reviewListMovie.css' %}">
 {% endblock %}
 
 
 {% block content %}
-    <a href="{% url 'movies:review_create' movie.id %}"><button class="float-right btn btn-outline-light">이 영화 리뷰쓰러 가기</button></a>
-    <h1>{{ movie.title }}의 리뷰 리스트</h1>
-    {% if not page_obj %}
-        <h2>작성된 리뷰가 없습니다.</h2>
-    {% else %}
-        <table class="table mt-5">
-            <thead>
-                <tr class="bg-dark text-white">
-                    <th >한줄평</th>
-                    <th>평점</th>
-                    <th>작성자</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for review in page_obj %}
-                    <tr>
-                        <td>{{ review.content }}</td>
-                        <td>{{ review.score }}</td>
-                        <td>{{ review.author }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
+  <a href="{% url 'movies:review_create' movie.id %}"><button class="float-right btn btn-outline-light">이 영화 리뷰쓰러 가기</button></a>
+  <h1>{{ movie.title }}의 리뷰 리스트</h1>
+  {% if not page_obj %}
+    <h2>작성된 리뷰가 없습니다.</h2>
+  {% else %}
+    <table class="table mt-5">
+      <thead>
+        <tr class="bg-dark text-white">
+          <th >한줄평</th>
+          <th>평점</th>
+          <th>작성자</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for review in page_obj %}
+          <tr>
+            <td>{{ review.content }}</td>
+            <td>{{ review.score }}</td>
+            <td>{{ review.author }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
 
-    <div class="d-flex justify-content-center">{% bootstrap_paginate page_obj range=10 show_prev_next="false" show_first_last="true"%}</div>
+  <div class="d-flex justify-content-center">{% bootstrap_paginate page_obj range=10 show_prev_next="false" show_first_last="true"%}</div>
 {% endblock %}
 
 
