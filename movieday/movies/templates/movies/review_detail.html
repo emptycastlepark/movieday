@@ -3,32 +3,38 @@
 
 {% block css %}
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="{% static 'movies/review_detail.css' %}">
+    <link rel="stylesheet" href="{% static 'movies/reviewDetail.css' %}">
 {% endblock %}
 
 
 {% block content %}
-    <div class="container">
+    <div class="container w-75 mx-auto">
         <div class="row">
             <div class="col">
                 <img src="https://image.tmdb.org/t/p/original/{{ review.movie.poster_path }}" alt="" class="img-thumbnail">
             </div>
             <div id="app" class="col">
                 <h1>{{ review.movie.title }}</h1>
-                <p>{{ review.movie.overview }}</p>
+                <p class="overview">{{ review.movie.overview }}</p>
                 <hr>
-                <p>한줄평: {{ review.content }}</p>
-                <p>평점: {{ review.score }}</p>
+                <h3>한줄평: {{ review.content }}</h3>
+                <h3>평점: {{ review.score }}</h3>
                 <hr>
                 <p>작성자: {{ review.author.nickname }}</p>
                 <p>작성일자: {{ review.created_at }}</p>
                 <p>수정일자: {{ review.updated_at }}</p>
                 {% if request.user == review.author %}
-                    <a href="{% url 'movies:review_update' review.id %}">리뷰 수정</a>
+                <div class="d-flex flex-row-reverse bd-highlight">
+                    <div class="p-2 bd-highlight">
                     <form action="{% url 'movies:review_delete' review.id %}" method="POST">
                         {% csrf_token %}
                         <button class="btn btn-danger">리뷰 삭제</button>
                     </form>
+                    </div>
+                    <div class="p-2 bd-highlight">
+                        <a href="{% url 'movies:review_update' review.id %}"><button class="btn btn-danger">리뷰 수정</button></a>
+                    </div>
+                </div>
                 {% endif %}
             </div>
         </div>
