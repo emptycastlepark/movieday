@@ -160,3 +160,6 @@ pip-selfcheck.json
 
 # API_KEY
 secret.json
+
+
+staticfiles/

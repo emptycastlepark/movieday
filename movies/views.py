@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Avg, Q
 from django.contrib import messages
 
-from movieday.settings import SECRET_KEY_WEATHER_API_KEY, SECRET_KEY_MOVIE_API_KEY, SECRET_KEY_KOBIS_API_KEY
+from movieday.settings.base import SECRET_KEY_WEATHER_API_KEY, SECRET_KEY_MOVIE_API_KEY, SECRET_KEY_KOBIS_API_KEY
 from .models import Movie, Genre, MovieReview
 from .forms import MovieReviewForm, MovieReviewWithoutMovieForm
 

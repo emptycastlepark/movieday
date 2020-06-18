@@ -14,22 +14,17 @@ import os
 import json
 
 from django.core.exceptions import ImproperlyConfigured
+from decouple import config
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'fh5426pv!vi8lr6+w8320c4%6+brqdq=0ci&xw)2+9g-^^y^a7'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
-
+SECRET_KEY = config('SECRET_KEY')
 
 # Application definition
 
@@ -150,9 +145,7 @@ AUTH_USER_MODEL = 'accounts.User'
 MEDIA_URL = '/media/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-
-with open('movieday/secret.json') as f:
+with open('movieday/settings/secret.json') as f:
     secret = json.loads(f.read())
 
 def get_secret(setting, secret=secret):
@@ -165,6 +158,7 @@ def get_secret(setting, secret=secret):
 SECRET_KEY_MOVIE_API_KEY = get_secret("SECRET_KEY_MOVIE_API_KEY")
 SECRET_KEY_WEATHER_API_KEY = get_secret("SECRET_KEY_WEATHER_API_KEY")
 SECRET_KEY_KOBIS_API_KEY = get_secret("SECRET_KEY_KOBIS_API_KEY")
+
 
 INTERNAL_IPS = [
     '127.0.0.1',
@@ -191,3 +185,6 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 LOGIN_REDIRECT_URL = '/movies/'
+
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
