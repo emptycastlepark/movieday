@@ -115,7 +115,6 @@ def review_top_movie(request):
     last_movie = Movie.objects.get(id=last_movies['movie'])
 
     top_movies = [[first_movie, first_movies['total']], [second_movie, second_movies['total']], [last_movie, last_movies['total']]]
-    print(messages.get_messages(request))
 
     context = {
         'top_movies': top_movies,
@@ -258,7 +257,6 @@ def search_movies(request, searchInput, pageNum):
 
     movies = entire_movies[pageNum*16:(pageNum+1)*16]
     
-    print(searchInput)
     return JsonResponse({'movies': movies, 'max_page': max_page}, status = 200)
 
 
@@ -403,7 +401,7 @@ def helper_function(input_list):
     slicing_list = list(input_list)
     sliced_list = []
 
-    for i in range(1, len(slicing_list) // 6):
+    for i in range(len(slicing_list) // 6):
         sliced_list.append(slicing_list[6*i:6*(i+1)])
 
     return sliced_list
