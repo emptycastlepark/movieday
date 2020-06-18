@@ -62,7 +62,7 @@
               <div class="modal-body">
                 <div class="container-fluid">
                   <div class="row">
-                    <img :src="getMoviePoster(movie)" class="card-img-top col-4" alt="...">
+                    <img :src="getMoviePoster(movie)" class="card-img-top col-4" alt="영화 포스터">
                     <div class="col-4">
                       <button class='btn btn-outline-success float-right'>[[ movie.vote_average ]]</button>
                       <p>개봉일 : [[ movie.release_date ]]</p>
@@ -119,28 +119,14 @@
     </div>
 
 
-    <div v-if="!isSearching">
-      <div class="btn btn-group">
-        <button @click="moveFirst" v-if="curPageNumber != 0">처음으로</button>
-        <button @click="movePage" v-if="curPageNumber - 1 > 0">[[ curPageNumber - 1 ]]</button>
-        <button @click="movePage" v-if="curPageNumber > 0">[[ curPageNumber ]]</button>
-        <button @click="movePage">[[ curPageNumber + 1 ]]</button>
-        <button @click="movePage" v-if="curPageNumber < maxPageNumber">[[ curPageNumber + 2 ]]</button>
-        <button @click="movePage" v-if="curPageNumber + 1 < maxPageNumber">[[ curPageNumber + 3 ]]</button>
-        <button @click="moveLast" v-if="curPageNumber != maxPageNumber">마지막으로</button>
-      </div>
-    </div>
-
-    <div v-else>
-      <div class="btn btn-group">
-        <button @click="moveSearchingPage" v-if="curPageNumber != 0">1</button>
-        <button @click="moveSearchingPage" v-if="curPageNumber - 1 > 0">[[ curPageNumber - 1 ]]</button>
-        <button @click="moveSearchingPage" v-if="curPageNumber > 0">[[ curPageNumber ]]</button>
-        <button @click="moveSearchingPage">[[ curPageNumber + 1 ]]</button>
-        <button @click="moveSearchingPage" v-if="curPageNumber < maxPageNumber">[[ curPageNumber + 2 ]]</button>
-        <button @click="moveSearchingPage" v-if="curPageNumber + 1 < maxPageNumber">[[ curPageNumber + 3 ]]</button>
-        <button @click="moveSearchingPage" v-if="curPageNumber != maxPageNumber">[[ maxPageNumber + 1 ]]</button>
-      </div>
+    <div class="btn btn-group">
+      <button @click="movePage" v-if="curPageNumber != 0">처음으로</button>
+      <button @click="movePage" v-if="curPageNumber - 1 > 0">[[ curPageNumber - 1 ]]</button>
+      <button @click="movePage" v-if="curPageNumber > 0">[[ curPageNumber ]]</button>
+      <button @click="movePage">[[ curPageNumber + 1 ]]</button>
+      <button @click="movePage" v-if="curPageNumber < maxPageNumber">[[ curPageNumber + 2 ]]</button>
+      <button @click="movePage" v-if="curPageNumber + 1 < maxPageNumber">[[ curPageNumber + 3 ]]</button>
+      <button @click="movePage" v-if="curPageNumber != maxPageNumber">마지막으로</button>
     </div>
   </div>
 {% endblock %}
@@ -172,7 +158,7 @@
       reviewInput: null,
       reviewScore: 0,
       searchInput: null,
-      realSearching: null,
+      searchingCash: null,
       isSearching: false,
       movieInfo: [null, null, null],
     },
@@ -202,40 +188,33 @@
         this.getMovies(0, this.standard, this.genre)
       },
       searchMovie() {
-        this.realSearching = this.searchInput
+        this.searchingCash = this.searchInput
         this.searchMovieProcess(0)
         this.searchInput = ''
         this.curPageNumber = 0
         this.isSearching = true
       },
       searchMovieProcess(pageNumber) {
-        axios.get(`/movies/search_movies/${this.realSearching}/${pageNumber}`)
+        axios.get(`/movies/search_movies/${this.searchingCash}/${pageNumber}`)
           .then(res => {
             this.movies = res.data.movies
             this.maxPageNumber = res.data.max_page
           })
           .catch(err => console.log(err))
       },
-      moveSearchingPage(event) {
-        let page = parseInt(event.target.innerText) - 1
-        this.curPageNumber = page
-        this.searchMovieProcess(page)
-        this.scrollToTop()
-      },
       movePage(event) {
-        let page = parseInt(event.target.innerText) - 1
-        this.curPageNumber = page
-        this.getMovies(page, this.standard, this.genre)
-        this.scrollToTop()
-      },
-      moveFirst() {
-        this.curPageNumber = 0
-        this.getMovies(0, this.standard, this.genre)
-        this.scrollToTop()
-      },
-      moveLast() {
-        this.curPageNumber = parseInt(this.maxPageNumber)
-        this.getMovies(this.maxPageNumber, this.standard, this.genre)
+        if (event.target.innerText == '처음으로') {
+          this.curPageNumber = 0
+        } else if (event.target.innerText == '마지막으로') {
+          this.curPageNumber = parseInt(this.maxPageNumber)
+        } else {
+          this.curPageNumber = parseInt(event.target.innerText) - 1
+        }
+        if (this.isSearching) {
+          this.searchMovieProcess(this.curPageNumber)
+        } else {
+          this.getMovies(this.curPageNumber, this.standard, this.genre)
+        }
         this.scrollToTop()
       },
       getMoviePoster(movie) {
@@ -250,14 +229,11 @@
       getCardId(movie) {
         return `card-${movie.id}`
       },
-      checkLike(movie) {
-        return this.like_movies.includes(movie.id)
+      getReviewUrl(movie) {
+        return `/movies/review_list_movie/${movie.id}`
       },
-      checkExclude(movie) {
-        return this.exclude_movies.includes(movie.id)
-      },
-      checkLater(movie) {
-        return this.later_movies.includes(movie.id)
+      getMovieOverview(movie) {
+        return movie.overview.substr(0, 30) + '...'
       },
       getGenres(movie) {
         axios.get(`/movies/get_genres/${movie.id}`)
@@ -266,6 +242,15 @@
             this.getReviews(movie)
           })
           .catch(err => console.log(err))
+      },
+      checkLike(movie) {
+        return this.like_movies.includes(movie.id)
+      },
+      checkExclude(movie) {
+        return this.exclude_movies.includes(movie.id)
+      },
+      checkLater(movie) {
+        return this.later_movies.includes(movie.id)
       },
       getInfo(movie) {
         let movieInfo = []
@@ -315,12 +300,6 @@
             this.reviewScore = 0
           })
           .catch(err => console.log(err))
-      },
-      getReviewUrl(movie) {
-        return `/movies/review_list_movie/${movie.id}`
-      },
-      getMovieOverview(movie) {
-        return movie.overview.substr(0, 30) + '...'
       },
       changeLike(movie, event) {
         axios.get(`/movies/movie_like/${movie.id}`)

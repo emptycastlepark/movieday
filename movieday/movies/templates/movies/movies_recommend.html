@@ -26,15 +26,8 @@
         </a>
 
         <div class="carousel-inner col-10 offset-1">
-          <div class="carousel-item active">
-            <div class="row">
-              {% for movie in recommend_movies_genre|slice:":6" %}
-                <img src="https://image.tmdb.org/t/p/original/{{ movie.poster_path }}" data-toggle="modal" data-target="#modal-{{ movie.pk }}" class="d-block col-2 carousel-img" alt="...">
-              {% endfor %}
-            </div>
-          </div>
           {% for movie_list in recommend_movies_genre|helper_function %}
-            <div class="carousel-item">
+            <div class="carousel-item {% if forloop.counter == 1 %} active {% endif %}">
               <div class="row">
                 {% for movie in movie_list %}
                   <img src="https://image.tmdb.org/t/p/original/{{ movie.poster_path }}" data-toggle="modal" data-target="#modal-{{ movie.pk }}" class="d-block col-2 carousel-img" alt="...">
@@ -85,15 +78,8 @@
         </a>
 
         <div class="carousel-inner col-10 offset-1">
-          <div class="carousel-item active">
-            <div class="row">
-              {% for movie in recommend_movies_score|slice:":6" %}
-                <img src="https://image.tmdb.org/t/p/original/{{ movie.poster_path }}" data-toggle="modal" data-target="#modal-{{ movie.pk }}" class="d-block col-2 carousel-img" alt="...">
-              {% endfor %}
-            </div>
-          </div>
           {% for movie_list in recommend_movies_score|helper_function %}
-            <div class="carousel-item">
+            <div class="carousel-item {% if forloop.counter == 1 %} active {% endif %}">
               <div class="row">
                 {% for movie in movie_list %}
                   <img src="https://image.tmdb.org/t/p/original/{{ movie.poster_path }}" data-toggle="modal" data-target="#modal-{{ movie.pk }}" class="d-block col-2 carousel-img" alt="...">
@@ -145,99 +131,51 @@
       
       <div class="row">
         <div id="indicators-recommend-weather" class="carousel slide" data-ride="carousel">
-          <a v-if="checkEmpty(second_movies)" class="carousel-control-prev col-1" href="#indicators-recommend-weather" role="button" data-slide="prev">
+          <a class="carousel-control-prev col-1" href="#indicators-recommend-weather" role="button" data-slide="prev">
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
             <span class="sr-only">Prev</span>
           </a>
 
           <div class="carousel-inner col-10 offset-1">
-            <div class="carousel-item active">
+            <div v-for="(movie_list, index) in recommendMoviesWeather" :class="getClass(index)">
               <div class="row">
-                <img v-for="movie in first_movies" :src="getPosterUrl(movie)" data-toggle="modal" :data-target="makeModalId(movie)" class="d-block col-2 carousel-img" alt="...">
-              </div>
-            </div>
-                  
-            <div v-if="checkEmpty(second_movies)" class="carousel-item">
-              <div class="row">
-                <img v-for="movie in second_movies" :src="getPosterUrl(movie)" data-toggle="modal" :data-target="makeModalId(movie)" class="d-block col-2 carousel-img" alt="...">
-              </div>
-            </div>
-                  
-            <div v-if="checkEmpty(last_movies)" class="carousel-item">
-              <div class="row">
-                <img v-for="movie in last_movies" :src="getPosterUrl(movie)" data-toggle="modal" :data-target="makeModalId(movie)" class="d-block col-2 carousel-img" alt="...">
+                  <img v-for="movie in movie_list" :src="getPosterUrl(movie)" data-toggle="modal" :data-target="makeModalId(movie)" class="d-block col-2 carousel-img" alt="...">
               </div>
             </div>
           </div>
 
-          <a v-if="checkEmpty(second_movies)" class="carousel-control-next col-1" href="#indicators-recommend-weather" role="button" data-slide="next">
+          <a class="carousel-control-next col-1" href="#indicators-recommend-weather" role="button" data-slide="next">
             <span class="carousel-control-next-icon" aria-hidden="true"></span>
             <span class="sr-only">Next</span>
           </a>
         </div>
       </div>
-    
-      <div v-for="movie in first_movies" class="modal fade" :id="getModalId(movie)" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLongTitle">[[ movie.title ]] ([[movie.original_title ]])</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <img :src="getPosterUrl(movie)" class="card-img-top" alt="...">
-            <div class="modal-body">
-              <button class='btn btn-outline-success float-right'>[[ movie.vote_average ]]</button><h3>줄거리</h3><p>(개봉일 : [[ movie.release_date ]])</p>
-              <p>[[ movie.overview ]]</p>
-              <hr>
-              <button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Close</button>
-              <a :href="getMovieReviewUrl(movie)"><button type="button" class="btn btn-outline-info">리뷰 보러 가기</button></a>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div v-if="checkEmpty(second_movies)" v-for="movie in second_movies" class="modal fade" :id="getModalId(movie)" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLongTitle">[[ movie.title ]] ([[movie.original_title ]])</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <img :src="getPosterUrl(movie)" class="card-img-top" alt="...">
-            <div class="modal-body">
-              <button class='btn btn-outline-success float-right'>[[ movie.vote_average ]]</button><h3>줄거리</h3><p>(개봉일 : [[ movie.release_date ]])</p>
-              <p>[[ movie.overview ]]</p>
-              <hr>
-              <button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Close</button>
-              <a :href="getMovieReviewUrl(movie)"><button type="button" class="btn btn-outline-info">리뷰 보러 가기</button></a>
+
+      <div v-for="movie_list in recommendMoviesWeather">
+        <div v-for="movie in movie_list" class="modal fade" :id="getModalId(movie)" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">[[ movie.title ]] ([[ movie.original_title ]])</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <img :src="getPosterUrl(movie)" class="card-img-top" alt="...">
+              <div class="modal-body">
+                <button class='btn btn-outline-success float-right'>[[ movie.vote_average ]]</button><h3>줄거리</h3><p>(개봉일 : [[ movie.release_date ]])</p>
+                <p>[[ movie.overview ]]</p>
+                <hr>
+                <button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Close</button>
+                <a :href="getMovieReviewUrl(movie)"><button type="button" class="btn btn-outline-info">리뷰 보러 가기</button></a>
+              </div>
             </div>
           </div>
         </div>
       </div>
-      <div v-if="checkEmpty(last_movies)" v-for="movie in last_movies" class="modal fade" :id="getModalId(movie)" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLongTitle">[[ movie.title ]] ([[movie.original_title ]])</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <img :src="getPosterUrl(movie)" class="card-img-top" alt="...">
-            <div class="modal-body">
-              <button class='btn btn-outline-success float-right'>[[ movie.vote_average ]]</button><h3>줄거리</h3><p>(개봉일 : [[ movie.release_date ]])</p>
-              <p>[[ movie.overview ]]</p>
-              <hr>
-              <button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Close</button>
-              <a :href="getMovieReviewUrl(movie)"><button type="button" class="btn btn-outline-info">리뷰 보러 가기</button></a>
-            </div>
-          </div>
-        </div>
-      </div>
+
     </div>
+    
   </div>
 {% endblock %}
 
@@ -255,10 +193,8 @@
       temperature: 0,
       recommend_ment: null,
       recommend_genre: null,
-      first_movies: [],
-      second_movies: [],
-      last_movies: [],
       isFakeLoc: true,
+      recommendMoviesWeather: [],
       },
     methods: {
       getWeatherMovie(latitude, longitude) {
@@ -270,9 +206,7 @@
               .then(res => {
                 this.recommend_ment = res.data.final_reason
                 this.recommend_genre = res.data.final_genre
-                this.first_movies = res.data.recommended_movies.slice(0, 6)
-                this.second_movies = res.data.recommended_movies.slice(6, 12)
-                this.last_movies = res.data.recommended_movies.slice(12, 18)
+                this.recommendMoviesWeather = [res.data.recommended_movies.slice(0, 6), res.data.recommended_movies.slice(6, 12), res.data.recommended_movies.slice(12, 18)]
               })
               .catch(err => {
                 console.log(err)
@@ -298,9 +232,7 @@
                   .then(response => {
                     self.recommend_ment = response.data.final_reason
                     self.recommend_genre = response.data.final_genre
-                    self.first_movies = response.data.recommended_movies.slice(0, 6)
-                    self.second_movies = response.data.recommended_movies.slice(6, 12)
-                    self.last_movies = response.data.recommended_movies.slice(12, 18)
+                    self.recommendMoviesWeather = [response.data.recommended_movies.slice(0, 6), response.data.recommended_movies.slice(6, 12), response.data.recommended_movies.slice(12, 18)]
                   })
                   .catch(err => {
                     console.log(err)
@@ -313,13 +245,13 @@
         }
 
         function error() {
-          status.textContent = 'Unable to retrieve your location';
+          status.textContent = '위치 검색에 실패했습니다.';
         }
 
         if(!navigator.geolocation) {
-          status.textContent = 'Geolocation is not supported by your browser';
+          status.textContent = '해당 브라우저에서는 지원하지 않습니다.';
         } else {
-          status.textContent = 'Locating…';
+          status.textContent = '위치를 찾고 있습니다...';
           navigator.geolocation.getCurrentPosition(success, error);
         }
       },
@@ -328,9 +260,7 @@
           .then(res => {
             this.recommend_ment = res.data.final_reason
             this.recommend_genre = res.data.final_genre
-            this.first_movies = res.data.recommended_movies.slice(0, 6)
-            this.second_movies = res.data.recommended_movies.slice(6, 12)
-            this.last_movies = res.data.recommended_movies.slice(12, 18)
+            this.recommendMoviesWeather = [res.data.recommended_movies.slice(0, 6), res.data.recommended_movies.slice(6, 12), res.data.recommended_movies.slice(12, 18)]
           })
           .catch(err => {
             console.log(err)
@@ -354,7 +284,14 @@
       },
       getMovieReviewUrl(movie) {
         return `/movies/review_list_movie/${movie.id}/`
-      }
+      },
+      getClass(index) {
+        if (index == 0) {
+          return 'carousel-item active'
+        } else {
+          return 'carousel-item'
+        }
+      },
     },
     created() {
       this.getWeatherMovie(37.48, 126.94)
